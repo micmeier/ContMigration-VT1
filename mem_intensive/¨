@@ -1,0 +1,10 @@
+#!/bin/bash
+
+source ./detector.sh
+
+detect_cluster
+detect_node
+detect_port
+
+echo "Executing 'python3 data_generator.py $NODE $PORT'"
+python3 data_generator.py $NODE $PORT

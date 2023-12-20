@@ -1,0 +1,70 @@
+# Statefulset
+apiVersion: apps/v1
+kind: StatefulSet
+metadata: 
+  name: redis
+spec: 
+  serviceName: redis-service
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: redis
+  template: 
+    metadata: 
+      labels: 
+        app: redis
+    spec:
+      initContainers: 
+      - name: init-mem-copy
+        image: busybox
+          #command: ["sh", "-c", "cp /home/ubuntu/apps/mem_intensive/migration/dump.rdb /data/dump.rdb"]
+        command: ["sh", "-c", "sleep 60"]
+        volumeMounts: 
+        - name: data
+          mountPath: /data/
+      containers: 
+      - name: redis
+        image: redis:latest
+        ports: 
+        - containerPort: 6379
+        volumeMounts:
+        - name: data
+          mountPath: /data/ 
+        - name: redis-config
+          mountPath: /etc/redis
+      volumes: 
+      - name: data
+        emptyDir: {}
+      - name: redis-config
+        configMap:
+          name: redis-config
+
+---
+
+# Service
+apiVersion: v1
+kind: Service
+metadata: 
+  name: redis-service
+spec: 
+  selector: 
+    app: redis
+  ports: 
+  - protocol: TCP
+    port: 6379
+    targetPort: 6379
+  type: LoadBalancer
+
+---
+
+# CofigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+data: 
+  redis.conf: |
+    dir /data/
+    dbfilename dump.rdb
+
+---

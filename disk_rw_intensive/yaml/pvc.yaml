@@ -1,0 +1,12 @@
+# Persistent Volume Claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: "storageclass-nfs"
+  resources:
+    requests:
+      storage: 1Gi

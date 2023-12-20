@@ -1,0 +1,12 @@
+# Persistent Volume Claim for redis
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: storageclass-nfs
+  resources:
+    requests:
+      storage: 10Gi

@@ -1,0 +1,14 @@
+# Persistent Volume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongo-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  storageClassName: storageclass-nfs
+  nfs:
+    path: /home/ubuntu/nfs/mongo
+    server: 10.0.0.180

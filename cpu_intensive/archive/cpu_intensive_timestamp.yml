@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cpu-statefulset
+spec:
+  serviceName: cpu-service
+  replicas: 0
+  selector:
+    matchLabels:
+      app: cpu-pod
+  template:
+    metadata:
+      labels:
+        app: cpu-pod
+    spec:
+      containers:
+      - name: cpu-intensive
+        image: docker.io/maant001/cpu-intensive:latest
+        securityContext:
+          capabilities:
+            drop:
+            - CAP_MKNOD
+            - CAP_NET_RAW
+            - CAP_AUDIT_WRITE
+        stdin: true
+        tty: true
