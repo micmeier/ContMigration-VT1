@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import norm
+plt.style.use('seaborn-deep')
+
 
 def read_data(file_path):
     with open(file_path, 'r') as file:
@@ -75,19 +77,34 @@ def create_scatter_plot(data_migr, data_pod, title):
     
     plt.show()
     
-def create_hist_plot(data, title):  
-    mu, std = norm.fit(data)
+def create_hist_plot(data1, data2, data3, title):  
+    mu1, std1 = norm.fit(data1)
+    mu2, std2 = norm.fit(data2)
+    mu3, std3 = norm.fit(data3)
+
     
-    bins = np.arange(0, max(data) + 5000, 5000)
-    plt.hist(data, edgecolor="black", bins=bins)
+    bins = np.arange(0, 35000, 5000)
+
+    #plt.hist(data1, edgecolor="black", bins=bins, label = "Disk Read Write Kill-First", align = "left")
+    #plt.hist(data2, edgecolor="black", bins=bins, label = "Mem Intensive Kill-First", align = "mid")
+    #plt.hist(data3, edgecolor="black", bins=bins, label = "Mem Intensive Replicate-First", align = "right")
+       
+    plt.hist([data2, data1, data3], 
+             bins, 
+             label=['Memory Kill-First',
+                    'Disk Read Write Kill-First',                     
+                    'Memory Replicate-First'])
+    plt.legend(loc='upper right', fontsize='large')
     
-    plt.title(title)
-    plt.xlabel("Time of Migration [ms]")
-    plt.ylabel("Amount of Migrations")
+    plt.title(title, fontsize='x-large')
+    plt.xlabel("Time of Migration [ms]", fontsize='large')
+    plt.ylabel("Amount of Migrations", fontsize='large')
+    plt.xticks(fontsize='large')
+    plt.yticks(fontsize='large')
     plt.grid(axis="y")
     
     savefile = 'C:/Users/rinik/OneDrive/Desktop/ZHAW/07_HS23/PA/ContMigration/data_processing/plots/histogram.pdf'
-    plt.savefig(savefile)
+    plt.savefig(savefile, dpi=450)
     plt.show()
     
 
@@ -126,13 +143,17 @@ data_m_drw_kf_local = read_data(path_m_drw_kf_local)
 data_d_drw_kf_local = read_data(path_d_drw_kf_local)
 
 
-data_migr = data_m_drw_kf_local
+data_migr1 = data_m_drw_kf
+data_migr2 = data_m_mem_kf
+data_migr3 = data_m_mem_rf
+
+
 data_pod = data_d_drw_kf_local
-title = "Kill-First Migration Disk Read Write Intensive without Load"
+title = "Migration Duration for tested techniques"
 
 #create_scatter_plot(filter_data(data_migr), filter_data(data_pod), title)
 #data.sort()
-data_migr.sort()
+#data_migr.sort()
 data_pod.sort()
-create_scatter_plot(filter_data(data_migr), filter_data(data_pod), title)
-create_hist_plot(filter_data(data_migr), title)
+#create_scatter_plot(filter_data(data_migr), filter_data(data_pod), title)
+create_hist_plot(filter_data(data_migr1), filter_data(data_migr2), filter_data(data_migr3), title)
