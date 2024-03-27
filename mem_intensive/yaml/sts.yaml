@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: redis
-        image: redis:latest
+        image: 10.0.0.180:5000/redis:latest
         ports:
         - containerPort: 6379
         volumeMounts:
@@ -26,3 +26,5 @@ spec:
       - name: data
         persistentVolumeClaim:
           claimName: redis-pvc
+      imagePullSecrets:
+      - name: regcred  

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cpu-config
+data:
+  num_cores: "4"  # Set the number of CPU cores
+  cpu_usage_per_core: "50"  # Set the CPU usage per core

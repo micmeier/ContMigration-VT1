@@ -1,17 +1,17 @@
 #!/bin/bash
 
-num_cores=$(nproc)
+echo -e "How many cores should be utilized?"
+echo -e "If x exceeds available cores of host, the maximum no. of cores will be used."
+read -p " Choose between 1-x: " chosen_cores
+echo "You entered: $chosen_cores"
 
-echo "$num_cores CPU cores available."
+echo -e "How much CPU usage per core?"
+read -p "Enter int between 1-100%: " chosen_percentage
+echo "You entered: $chosen_percentage"
 
-read -p "How many cores should be utilized? Available: Choose between 1-$num_cores: " chosen_cores
+# Update the YAML file with the chosen values
+sed -i "s/value: \"2\"/value: \"$chosen_cores\"/" cpu_sts.yaml
+sed -i "s/value: \"15\"/value: \"$chosen_percentage\"/" cpu_sts.yaml
 
-echo "You chose $chosen_cores cores."
-
-read -p "How much CPU Usage per core in percent? (Enter int between 1 and 100): " chosen_percentage 
-
-if [ "$chosen_cores" -eq 1 ]; then
-	cpulimit -l $chosen_percentage python3 cpu_state_machine_singlecore.py
-else
-	python3 cpu_state_machine_multicore.py $chosen_percentage $chosen_cores &
-fi
+# Run the yaml
+kubectl apply -f cpu_sts.yaml
