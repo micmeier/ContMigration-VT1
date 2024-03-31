@@ -18,13 +18,16 @@ spec:
         image: docker.io/maant001/cpu-intensive:latest
         env:
         - name: NUM_CORES
-          value: "3"
+          value: "2"
         - name: CPU_USAGE_PER_CORE
-          value: ""
+          value: "25"
         # Run the specified script
-        command: ["/bin/sh", "-c"]
-        args:
-        - python3 /cpu_intensive/cpu_state_machine_multicore.py $CPU_USAGE_PER_CORE $NUM_CORES 
+#        command: ["/bin/sh", "-c"]
+#        args:
+#        - python3
+#        - /cpu_intensive/cpu_state_machine_multicore.py
+#        - "$(CPU_USAGE_PER_CORE)"
+#        - "$(NUM_CORES)"
         volumeMounts:
         - name: cpulimit-volume
           mountPath: /usr/bin/cpulimit

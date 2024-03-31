@@ -10,3 +10,6 @@ COPY cpu_state_machine_multicore.py cpu_state_machine_multicore.py
 
 # Default command: Sleep indefinitely
 #CMD ["sleep", "infinity"]
+
+# Default command to run the multicore script with parameters 25 and 2
+CMD ["python3", "cpu_state_machine_multicore.py", "25", "2"]
