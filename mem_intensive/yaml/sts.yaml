@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: redis
-        image: 10.0.0.180:5000/redis:latest
+        image: 10.0.0.180:5000/redis:local
         ports:
         - containerPort: 6379
         volumeMounts:
