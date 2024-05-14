@@ -4,7 +4,7 @@ metadata:
   name: cpu
 spec:
   serviceName: cpu-service
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       app: cpu
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: cpu-container
-        image: 10.0.0.180:5000/localcpu:local
+        image: 10.0.0.180:5000/localcpu:checkpoint
         env:
         - name: NUM_CORES
           value: "3"

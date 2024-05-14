@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web
+spec:
+  containers:
+  - name: web
+    image: 10.0.0.180:5000/localweb:local

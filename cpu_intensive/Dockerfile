@@ -8,8 +8,11 @@ WORKDIR /cpu_intensive
 COPY cpu_state_machine_singlecore.py cpu_state_machine_singlecore.py
 COPY cpu_state_machine_multicore.py cpu_state_machine_multicore.py
 
-# Default command: Sleep indefinitely
-#CMD ["sleep", "infinity"]
+# Copy the cpulimit executable into the container (adjusted for worker node)
+#COPY /usr/bin/cpulimit /usr/bin/cpulimit
+
+# Set permissions if necessary
+#RUN chmod +x /usr/bin/cpulimit
 
 # Default command to run the multicore script with parameters 25 and 2
 CMD ["python3", "cpu_state_machine_multicore.py", "25", "2"]
