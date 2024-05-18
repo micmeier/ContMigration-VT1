@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cpu-singlecore-restore-pod
+spec:
+  containers:
+  - name: cpu-singlecore-restore-container
+    image: 10.0.0.180:5000/cpu-checkpoint:latest
+  nodeName: worker1

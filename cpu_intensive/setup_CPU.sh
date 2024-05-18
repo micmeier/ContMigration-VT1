@@ -12,7 +12,7 @@ echo -e "Number of Replicasets?"
 read -p "Enter an int: " number_replicaset
 
 # Run the yaml
-kubectl apply -f cpu_sts.yaml
+kubectl apply -f yaml/cpu_sts.yaml
 
 # Patch the StatefulSet with the chosen values
 kubectl patch statefulset cpu --type='json' -p "[{\"op\": \"replace\", \"path\": \"/spec/template/spec/containers/0/env/0/value\", \"value\": \"$chosen_cores\"}, {\"op\": \"replace\", \"path\": \"/spec/template/spec/containers/0/env/1/value\", \"value\": \"$chosen_percentage\"}, {\"op\": \"replace\", \"path\": \"/spec/replicas\", \"value\": $number_replicaset}]"

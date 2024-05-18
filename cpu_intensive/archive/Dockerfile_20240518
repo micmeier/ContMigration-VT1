@@ -5,8 +5,7 @@ FROM python:3.9
 WORKDIR /cpu_intensive
 
 # Copy Python scripts into the container
-COPY cpu_state_machine_singlecore.py cpu_state_machine_singlecore.py
-COPY cpu_state_machine_multicore.py cpu_state_machine_multicore.py
+COPY cpu_singlecore.py cpu_singlecore.py
 
 # Copy the cpulimit executable into the container (adjusted for worker node)
 #COPY /usr/bin/cpulimit /usr/bin/cpulimit
@@ -15,4 +14,4 @@ COPY cpu_state_machine_multicore.py cpu_state_machine_multicore.py
 #RUN chmod +x /usr/bin/cpulimit
 
 # Default command to run the multicore script with parameters 25 and 2
-CMD ["python3", "cpu_state_machine_multicore.py", "25", "2"]
+CMD ["python3", "cpu_singlecore.py"]
