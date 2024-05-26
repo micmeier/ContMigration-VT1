@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: cpu-container
-        image: 10.0.0.180:5000/localcpu:local
+        image: 10.0.0.180:5000/localcpusinglecore:latest
         env:
         - name: NUM_CORES
           value: "3"

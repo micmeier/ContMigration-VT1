@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cpu-restore
+spec:
+  replicas: 1  # Update this value as needed
+  selector:
+    matchLabels:
+      app: cpu-restore
+  template:
+    metadata:
+      labels:
+        app: cpu-restore
+      #annotations: 
+        #io.kubernetes.cri-o.TrySkipVolumeSELinuxLabel: "true"
+    spec:
+      containers:
+      - name: cpu-restore
+        image: 10.0.0.180:5000/localcpusinglecorerestore:checkpoint
+        securityContext:
+          seLinuxOptions:
+            level: s0:c525,c600
+#        volumeMounts: 
+#        - mountPath: /var/lib/containers/storage/overlay/bdf80b1726fd787ca9f4245d165899bc76f187d7f3ae792c86c624abc3d102be/merged/
+#          name: checkpoint-volume
+#      volumes: 
+#      - name: checkpoint-volume
+#        hostPath: 
+#          path: /var/lib/containers/storage/overlay/bdf80b1726fd787ca9f4245d165899bc76f187d7f3ae792c86c624abc3d102be/merged/
+#          type: Directory
+#  volumeClaimTemplates:
+#    - metadata:
+#        name: checkpoint-data
+#      spec:
+#        accessModes: [ "ReadWriteOnce" ]
+#        resources:
+#          requests:
+#            storage: 1Gi  # Update this value as needed
+#      nodeName: worker2  # If you still want to specify the node

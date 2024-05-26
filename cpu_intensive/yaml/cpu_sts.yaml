@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cpu
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cpu
+  template:
+    metadata:
+      labels:
+        app: cpu
+    spec:
+      containers:
+      - name: cpu-container
+        image: 10.0.0.180:5000/localcpusinglecore:latest
+        env:
+        command: ["/bin/sh", "-c"]
+        args: ["python3 /cpu_intensive/cpu_singlecore.py"]          
+          

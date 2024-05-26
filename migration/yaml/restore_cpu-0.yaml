@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cpu-restore
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cpu-restore
+  template:
+    metadata:
+      annotations: 
+        io.kubernetes.cri-o.TrySkipVolumeSELinuxLabel: 'true'
+      labels:
+        app: cpu-restore
+    spec:
+      containers:
+      - name: cpu-restore
+        image: 10.0.0.180:5000/localcpusinglecore:checkpoint
+        imagePullPolicy: Always
+        securityContext:
+          seLinuxOptions:
+            level: s0:c0
+

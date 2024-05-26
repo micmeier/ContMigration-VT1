@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cpu-singlecore-restore3-sts-2105
+spec:
+  serviceName: cpu-singlecore-restore3-service
+  replicas: 1  # Update this value as needed
+  selector:
+    matchLabels:
+      app: cpu-singlecore-restore3
+  template:
+    metadata:
+      labels:
+        app: cpu-singlecore-restore3
+    spec:
+      containers:
+      - name: cpu-singlecore-restore3
+        image: 10.0.0.180:5000/cpu-restore3-image:checkpoint
+        imagePullPolicy: Always
+      nodeName: worker2

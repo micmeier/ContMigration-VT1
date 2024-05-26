@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: wsr
+  annotations:
+    io.kubernetes.cri-o.TrySkipVolumeSELinuxLabel: "true"
+  labels:
+    app: wsr
+spec:
+  containers:
+  - name: wsr
+    image: 10.0.0.180:5000/nginxrestore:checkpoint
+    resources: 
+      limits: 
+        memory: "7Gi"
+        cpu: "3"
+      requests: 
+        memory: "2Gi"
+        cpu: "1"
+    imagePullPolicy: Always
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 80
+        scheme: HTTP
+      initialDelaySeconds: 5
+      periodSeconds: 5
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 80
+        scheme: HTTP
+      initialDelaySeconds: 5
+      periodSeconds: 5
+    securityContext: 
+      allowPrivilegeEscalation: true
+      seLinuxOptions: 
+        level: s0:c0
+    command: ["/bin/sh", "-c", "sudo umount /sys/kernel/config"]
+      #  - name: debug
+      #image: busybox
+      #command: ["/bin/sh", "-c", "sleep 3600"]
+      #imagePullSecrets:
+    #- name: registry-credentials
+  restartPolicy: Never

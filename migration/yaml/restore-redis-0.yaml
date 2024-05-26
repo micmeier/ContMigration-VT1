@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-restore
+spec:
+  replicas: 1
+  selector: 
+    matchLabels: 
+      app: redis-restore
+  template: 
+    metadata:
+      annotations: 
+        io.kubernetes.cri-o.TrySkipVolumeSELinuxLabel: 'true'
+      labels: 
+        app: redis-restore
+    spec: 
+      containers:
+      - name: redis-restore 
+        image: 10.0.0.180:5000/redis:checkpoint
+        imagePullPolicy: Always
+        securityContext:
+          allowPrivilegeEscalation: true
+          seLinuxOptions: 
+            level: s0:c525,c600
+      imagePullSecrets:
+      - name: registry-credentials
+      restartPolicy: Never
+      runtimeClassName: selinux

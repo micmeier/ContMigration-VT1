@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cpu-singlecore-restore2305-pod
+  labels:
+    app: cpu-singlecore-restore2305
+spec:
+  containers:
+  - name: cpu-singlecore-restore2305
+    image: 10.0.0.180:5000/cpu-restore-2305-image:checkpoint
+    imagePullPolicy: Always
+    securityContext:
+      seLinuxOptions:
+        level: s0:c525:c600
+  nodeName: worker3

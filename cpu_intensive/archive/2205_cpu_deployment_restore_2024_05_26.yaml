@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cpu-singlecore-restore5-deployment
+spec:
+  replicas: 1  # Start with 0 replicas
+  selector:
+    matchLabels:
+      app: cpu-singlecore-restore5
+  template:
+    metadata:
+      labels:
+        app: cpu-singlecore-restore5
+    spec:
+      containers:
+      - name: cpu-singlecore-restore5
+        image: 10.0.0.180:5000/2205-cpu-pod-restore-image:checkpoint
+        imagePullPolicy: Always
+      nodeName: worker2
