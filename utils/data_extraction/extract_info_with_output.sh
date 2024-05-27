@@ -25,7 +25,11 @@ output_dir="/home/ubuntu/ContMigration/utils/data_extraction/extracted_data"
 #mkdir -p "$output_dir"
 
 # Get the base name of the checkpoint file
-checkpoint_basename=$(basename "$checkpoint_file")
+# checkpoint_basename=$(basename "$checkpoint_file")
+
+# Get the base name of the checkpoint file and adjust the name
+checkpoint_basename=$(basename "$checkpoint_file" .tar)
+checkpoint_basename=$(echo "$checkpoint_basename" | sed 's/:/-/g')
 
 # Construct the output file path
 output_file="$output_dir/data-${checkpoint_basename}.csv"

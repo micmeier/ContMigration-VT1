@@ -1,11 +1,9 @@
-# Statefulset
 apiVersion: apps/v1
 kind: StatefulSet
 metadata: 
   name: redis
 spec: 
-  serviceName: redis-service
-  replicas: 0
+  replicas: 1
   selector: 
     matchLabels:
       app: redis
@@ -16,79 +14,6 @@ spec:
     spec:
       containers: 
       - name: redis
-        image: redis:latest
+        image: 10.0.0.180:5000/localredis:latest
         ports: 
         - containerPort: 6379
-        volumeMounts:
-        - name: data
-          mountPath: /data/ 
-        - name: redis-config
-          mountPath: /etc/redis
-      volumes: 
-      - name: data
-        persistentVolumeClaim: 
-          claimName: redis-pvc
-      - name: redis-config
-        configMap:
-          name: redis-config
-
----
-
-# Service
-apiVersion: v1
-kind: Service
-metadata: 
-  name: redis-service
-spec: 
-  selector: 
-    app: redis
-  ports: 
-  - protocol: TCP
-    port: 6379
-    targetPort: 6379
-  type: LoadBalancer
-
----
-
-# CofigMap
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: redis-config
-data: 
-  redis.conf: |
-    dir /data/
-    dbfilename dump.rdb
-
----
-
-# Persistent Volume
-apiVersion: v1
-kind: PersistentVolume
-metadata: 
-  name: redis-pv
-spec: 
-  capacity: 
-    storage:  1Gi
-  accessModes: 
-    - ReadWriteOnce
-  nfs: 
-    path: /home/ubuntu/apps/mem_intensive/nfs
-    server: 10.0.0.180
-
----
-
-# Persistent Volume Claim
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata: 
-  name: redis-pvc
-spec: 
-  accessModes: 
-    - ReadWriteOnce
-  storageClassName: ""
-  resources: 
-    requests: 
-      storage: 1Gi
-
-
