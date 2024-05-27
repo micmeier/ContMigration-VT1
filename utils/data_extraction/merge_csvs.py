@@ -1,0 +1,51 @@
+import os
+import sys
+
+def combine_csv_files(input_directory, output_file='/home/ubuntu/ContMigration/utils/data_extraction/combined_data.csv'):
+    # Get list of all CSV files in the input directory
+    csv_files = [f for f in os.listdir(input_directory) if f.endswith('.csv')]
+
+    # Ensure there are CSV files to process
+    if not csv_files:
+        print("No CSV files found in the directory.")
+        return
+
+    # Extract pod name from the input directory
+    pod_name = os.path.basename(input_directory)
+
+    # Construct the output file path with pod name
+    output_file = f"{pod_name}-combined-data.csv"
+
+    # Open the output file for writing
+    with open(output_file, 'w') as outfile:
+        # Track whether the header has been written
+        header_written = False
+        
+        # Iterate through each CSV file
+        for filename in csv_files:
+            file_path = os.path.join(input_directory, filename)
+            with open(file_path, 'r') as infile:
+                # Read the content of the current CSV file
+                lines = infile.readlines()
+                
+                # Write the header only once
+                if not header_written:
+                    outfile.write(lines[0])  # Write the header
+                    header_written = True
+                
+                # Write the remaining lines (data) without the header
+                outfile.writelines(lines[1:])
+            
+    print(f"Combined CSV file saved as {output_file}")
+
+if __name__ == "__main__":
+    # Check if the correct number of arguments is provided
+    if len(sys.argv) != 2:
+        print("Usage: python merge_csvs.py <input_directory>")
+        sys.exit(1)
+
+    # Get the input directory from the command-line arguments
+    input_directory = sys.argv[1]
+
+    # Call the function to combine CSV files
+    combine_csv_files(input_directory)

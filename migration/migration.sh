@@ -58,7 +58,7 @@ do
 	buildah commit $newcontainer $checkpoint_image_name:checkpoint
 	buildah rm $newcontainer
 
-	echo "Pushing image to local registry"
+	echo "Pushing image \"$checkpoint_image_name:checkpoint\" to local registry"
 	# Step 6: Push the image to local registry
 	buildah push --tls-verify=false localhost/$checkpoint_image_name:checkpoint 10.0.0.180:5000/$checkpoint_image_name:checkpoint
 	
@@ -96,6 +96,10 @@ do
 	
 	kubectl wait --for=delete pod/$newPodName
 	echo "$newPodName deleted"
+
+	echo "Deleting all dangling images from local podman registry"
+	podman rmi $(podman images -q --filter "dangling=true")
+
 done
 
 

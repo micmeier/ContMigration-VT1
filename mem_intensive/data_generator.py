@@ -5,7 +5,7 @@ import sys
 import time
 
 def write_data(count):
-    while True:
+    while count < 2000:
         current_time = datetime.now().strftime("%d.%m.%Y %H:%M:%S.%f")
         key = f"key_{count}"
         
@@ -17,7 +17,7 @@ def write_data(count):
         redis_conn.set(key, value)
         print(f"{value} set at key {count}")
         count += 1
-        time.sleep(1)
+       # time.sleep(1)
 
 def get_last_key(redis_conn):
     keys = redis_conn.keys("key_*")

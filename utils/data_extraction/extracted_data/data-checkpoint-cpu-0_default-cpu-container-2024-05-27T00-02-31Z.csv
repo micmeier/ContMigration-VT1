@@ -1,2 +1,0 @@
-Image,Checkpointed,Checkpoint size,Freezing time,Frozen time,Memdump time,Memwrite time,Total dump time (ms)
-10.0.0.180:5000/localcpusinglecore:latest,2024-05-27T00:02:31Z,4.3 MiB,271 µs,74.329 ms,4.916 ms,3.272 ms,82.788
