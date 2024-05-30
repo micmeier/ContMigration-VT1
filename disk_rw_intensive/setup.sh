@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# start redis on cluster 1
+# start mongodb on cluster 1
 kubectl config use-context cluster1
 kubectl apply -f yaml/sts.yaml
 kubectl apply -f yaml/sc.yaml
 kubectl apply -f yaml/svc.yaml
 
-# start redis on cluster 2
+# start mongodb on cluster 2
 kubectl config use-context cluster2
 kubectl apply -f yaml/sts.yaml
 kubectl apply -f yaml/sc.yaml

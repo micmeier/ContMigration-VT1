@@ -1,12 +1,11 @@
+# Persistent Volume Claim
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mongo-pvc
 spec:
   accessModes:
-    - ReadWriteOnce
-  storageClassName: manual
+    - ReadWriteMany
   resources:
     requests:
-      storage: 10Gi
-
+      storage: 1Gi

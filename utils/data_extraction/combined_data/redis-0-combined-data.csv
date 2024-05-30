@@ -1,0 +1,8 @@
+Image,Checkpointed,Checkpoint size,Freezing time,Frozen time,Memdump time,Memwrite time,Total dump time (ms)
+10.0.0.180:5000/localredis:latest,2024-05-27T19:31:45Z,2.4 MiB,686 µs,114.72 ms,5.282 ms,3.181 ms,123.869
+10.0.0.180:5000/localredis:latest,2024-05-27T19:32:04Z,2.4 MiB,700 µs,105.58 ms,5.337 ms,3.09 ms,114.707
+10.0.0.180:5000/localredis:latest,2024-05-27T19:31:35Z,2.3 MiB,383 µs,69.492 ms,3.237 ms,1.989 ms,75.101
+10.0.0.180:5000/localredis:latest,2024-05-27T19:31:54Z,2.3 MiB,383 µs,72.944 ms,3.464 ms,2.205 ms,78.996
+10.0.0.180:5000/localredis:latest,2024-05-27T19:32:13Z,2.3 MiB,379 µs,72.292 ms,3.432 ms,2.08 ms,78.183
+10.0.0.180:5000/localredis:latest,2024-05-27T19:31:25Z,2.4 MiB,723 µs,106.51 ms,5.341 ms,3.071 ms,115.645
+10.0.0.180:5000/localredis:latest,2024-05-27T19:31:15Z,2.3 MiB,370 µs,74.728 ms,3.602 ms,2.233 ms,80.933

@@ -13,12 +13,13 @@ convert_to_ms() {
 }
 
 # Check if the required argument is provided
-if [ $# -ne 1 ]; then
+if [ $# -ne 2 ]; then
   echo "Usage: $0 <checkpoint file>"
   exit 1
 fi
 
 checkpoint_file=$1
+index=$2
 output_dir="/home/ubuntu/ContMigration/utils/data_extraction/extracted_data"
 
 # Create the output directory if it doesn't exist
@@ -38,7 +39,7 @@ output_file="$output_dir/data-${checkpoint_basename}.csv"
 output=$(checkpointctl inspect "$checkpoint_file" --stats)
 
 # Extract and print the required values in CSV format
-echo "Image,Checkpointed,Checkpoint size,Freezing time,Frozen time,Memdump time,Memwrite time,Total dump time (ms)" > "$output_file"
+echo "Index,Image,Checkpointed,Checkpoint size,Freezing time,Frozen time,Memdump time,Memwrite time,Total dump time (ms)" > "$output_file"
 # Image
 image=$(echo "$output" | grep -E '^\s*├── Image:' | awk -F': ' '{print $2}')
 # Checkpointed
@@ -71,7 +72,7 @@ echo "  Memwrite time: $memwrite_time"
 echo "Total dump time: ${total_dump_time_ms} ms"
 
 # Print the extracted values in CSV format and save to the output file
-echo "$image,$checkpointed,$checkpoint_size,$freezing_time,$frozen_time,$memdump_time,$memwrite_time,$total_dump_time_ms" >> "$output_file"
+echo "$index,$image,$checkpointed,$checkpoint_size,$freezing_time,$frozen_time,$memdump_time,$memwrite_time,$total_dump_time_ms" >> "$output_file"
 
 # Print the path of the output file
 echo "Output saved to: $output_file"

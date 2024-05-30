@@ -14,7 +14,7 @@ def main():
     # Start with State 1
     current_state_index = 0
 
-    # Count Cycles / Resembles "State"?
+    # Count Cycles / Resembles "State" together with current_state_index
     cycle_count = 0
 
     # Init previous state index

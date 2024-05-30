@@ -47,9 +47,10 @@ if __name__ == "__main__":
 
     try:
         while True:
+            if key >=10000:
+                break
             write_random_data(collection, key)
             key += 1
-            time.sleep(1)
     except KeyboardInterrupt:
         print("\nScript terminated by user.")
     finally:

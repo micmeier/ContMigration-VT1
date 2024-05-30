@@ -5,7 +5,7 @@ import sys
 import time
 
 def write_data(count):
-    while count < 2000:
+    while count < 10000:
         current_time = datetime.now().strftime("%d.%m.%Y %H:%M:%S.%f")
         key = f"key_{count}"
         

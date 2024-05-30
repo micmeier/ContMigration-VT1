@@ -7,7 +7,7 @@ metadata:
   name: mongo
 spec:
   serviceName: mongo-service
-  replicas: 0
+  replicas: 1
   selector: 
     matchLabels: 
       app: mongo
@@ -18,7 +18,7 @@ spec:
     spec:  
       containers: 
       - name: mongo
-        image: mongo:latest
+        image: 10.0.0.180:5000/localmongo:latest
         ports:
         - containerPort: 27017
         volumeMounts: 
@@ -54,12 +54,12 @@ metadata:
   name: mongo-db
 spec: 
   capacity: 
-    storage: 10Gi
+    storage: 2Gi
   accessModes: 
     - ReadWriteMany
-  nfs: 
-    path: /home/ubuntu/nfs/mongo
-    server: 10.0.0.180
+  persistentVolumeReclaimPolicy: Retain
+  hostPath: 
+    path: "/mnt/data/mongo"
 
 ---
 
@@ -74,4 +74,4 @@ spec:
   storageClassName: ""
   resources: 
     requests: 
-      storage: 1Gi
+      storage: 2Gi

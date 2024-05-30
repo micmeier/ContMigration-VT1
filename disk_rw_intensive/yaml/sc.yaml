@@ -5,8 +5,7 @@ metadata:
   annotations:
     storageclass.kubernetes.io/is-default-class: "true"
 parameters:
-  server: podman
-  path: /home/ubuntu/apps/mem_intensive/ganesha
+  server: localhost
+  path: /home/ubuntu/mongoStorage
   readOnly: "false"
-provisioner: nfs
 reclaimPolicy: Retain

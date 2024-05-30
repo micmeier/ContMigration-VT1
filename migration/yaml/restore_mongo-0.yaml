@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo-restore
+spec:
+  serviceName: mongo-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-restore
+  template:
+    metadata:
+      annotations: 
+        io.kubernetes.cri-o.TrySkipVolumeSELinuxLabel: 'true'
+      labels:
+        app: mongo-restore
+    spec:
+      containers:
+      - name: mongo-restore
+        image: 10.0.0.180:5000/localmongo:checkpoint
+        ports:
+        - containerPort: 27017
+        imagePullPolicy: Always
+        securityContext:
+          seLinuxOptions:
+            level: s0:c0
