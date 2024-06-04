@@ -19,15 +19,13 @@ do
 	
 	index=$((index + 1))
 
+	kubectl config use-context cluster1
+
 	currentCluster=$(kubectl config current-context)
 	echo "-- Current cluster: $currentCluster --"
 
-	if [ $currentCluster == "cluster1" ]
-	then
-		destCluster="cluster2"
-	else
-		destCluster="cluster1"
-	fi
+	destCluster="cluster2"
+
 
 	# Step 2: Get pod, container names, and node where the pod is running
 	containername=$(kubectl get pods $podName -o jsonpath='{.spec.containers[0].name}')
