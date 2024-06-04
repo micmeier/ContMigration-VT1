@@ -44,7 +44,7 @@ def plot_hist_without_outliers(data):
         plt.show()
 
 input_file_path = 'C:/Users/rinik/OneDrive/Desktop/ZHAW//07_HS23/PA/ContMigration/utils/data_extraction/data_dump/cpu-0_migration_times.csv'
-output_file_path = 'C:/Users/rinik/OneDrive/Desktop/ZHAW//07_HS23/PA/ContMigration/utils/data_extraction/data_dump/test.csv'
+output_file_path = 'C:/Users/rinik/OneDrive/Desktop/ZHAW//07_HS23/PA/ContMigration/utils/data_processing/cpu/cpu-0_migration-times.csv'
 
 data_raw = pd.read_csv(input_file_path, delimiter=',')
 
