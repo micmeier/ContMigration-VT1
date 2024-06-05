@@ -42,6 +42,32 @@ def plot_hist_without_outliers(data):
         plt.ylabel('Frequency')
         plt.grid(True)
         plt.show()
+        
+def plot_scatter_with_outliers(data):
+    columns = data.columns[1:]
+    
+    for column in columns:
+        plt.plot(data[column])
+        plt.title(f'{column}-Time for Migrations of a CPU Intensive Application')
+        plt.xlabel('Iteration')
+        plt.ylabel('Duration (ms)')
+    
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+        
+def plot_scatter_without_outliers(data):
+    columns = data.columns[1:]
+    
+    for column in columns:
+        columns = remove_outliers(data, column)
+        plt.plot(data[column])
+        plt.title(f'{column}-Time for Migrations of a CPU Intensive Application without outliers')
+        plt.xlabel('Iteration')
+        plt.ylabel('Duration (ms)')
+
+        plt.grid(True)
+        plt.show()
 
 input_file_path = 'C:/Users/rinik/OneDrive/Desktop/ZHAW//07_HS23/PA/ContMigration/utils/data_extraction/data_dump/cpu-0_migration_times.csv'
 output_file_path = 'C:/Users/rinik/OneDrive/Desktop/ZHAW//07_HS23/PA/ContMigration/utils/data_processing/cpu/cpu-0_migration-times.csv'
@@ -53,6 +79,8 @@ data_raw_stats = calc_stats(data_raw)
 
 plot_hist_with_outliers(data_raw)
 plot_hist_without_outliers(data_raw)
+plot_scatter_with_outliers(data_raw)
+plot_scatter_without_outliers(data_raw)
 
 data_raw_stats.to_csv(output_file_path)
 
