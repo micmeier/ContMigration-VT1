@@ -1,0 +1,545 @@
+Setup Cluster with CRIU enabled
+
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+	Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+	100   138  100   138    0     0    705      0 --:--:-- --:--:-- --:--:--   707
+	100 49.0M  100 49.0M    0     0  34.8M      0  0:00:01  0:00:01 --:--:-- 50.5M
+
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+  	% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+	100   138  100   138    0     0    647      0 --:--:-- --:--:-- --:--:--   647
+	100    64  100    64    0     0    192      0 --:--:-- --:--:-- --:--:--   192
+
+echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+	kubectl: OK
+
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+kubectl version --client
+	Client Version: v1.30.0
+	Kustomize Version: v5.0.4-0.20230601165947-6ce0bf390ce3
+
+cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+overlay	
+br_netfilter
+EOF
+	overlay
+	br_netfilter	
+
+sudo modprobe overlay
+
+sudo modprobe br_netfilter
+
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-iptables  = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.ipv4.ip_forward                 = 1
+EOF
+	net.bridge.bridge-nf-call-iptables  = 1
+	net.bridge.bridge-nf-call-ip6tables = 1
+	net.ipv4.ip_forward                 = 1
+
+sudo sysctl --system
+	..* Applying /etc/sysctl.d/10-console-messages.conf ...
+	kernel.printk = 4 4 1 7
+	* Applying /etc/sysctl.d/10-ipv6-privacy.conf ...
+	net.ipv6.conf.all.use_tempaddr = 2
+	net.ipv6.conf.default.use_tempaddr = 2
+	* Applying /etc/sysctl.d/10-kernel-hardening.conf ...
+	kernel.kptr_restrict = 1
+	* Applying /etc/sysctl.d/10-magic-sysrq.conf ...
+	kernel.sysrq = 176
+	* Applying /etc/sysctl.d/10-network-security.conf ...
+	net.ipv4.conf.default.rp_filter = 2
+	net.ipv4.conf.all.rp_filter = 2
+	* Applying /etc/sysctl.d/10-ptrace.conf ...	
+	kernel.yama.ptrace_scope = 1
+	* Applying /etc/sysctl.d/10-zeropage.conf ...
+	vm.mmap_min_addr = 65536
+	* Applying /usr/lib/sysctl.d/50-default.conf ...
+	kernel.core_uses_pid = 1
+	net.ipv4.conf.default.rp_filter = 2
+	net.ipv4.conf.default.accept_source_route = 0
+	sysctl: setting key "net.ipv4.conf.all.accept_source_route": Invalid argument
+	net.ipv4.conf.default.promote_secondaries = 1
+	sysctl: setting key "net.ipv4.conf.all.promote_secondaries": Invalid argument
+	net.ipv4.ping_group_range = 0 2147483647
+	net.core.default_qdisc = fq_codel
+	fs.protected_hardlinks = 1
+	fs.protected_symlinks = 1
+	fs.protected_regular = 1
+	fs.protected_fifos = 1
+	* Applying /usr/lib/sysctl.d/50-pid-max.conf ...
+	kernel.pid_max = 4194304
+	* Applying /etc/sysctl.d/99-cloudimg-ipv6.conf ...
+	net.ipv6.conf.all.use_tempaddr = 0
+	net.ipv6.conf.default.use_tempaddr = 0
+	* Applying /usr/lib/sysctl.d/99-protect-links.conf ...
+	fs.protected_fifos = 1
+	fs.protected_hardlinks = 1
+	fs.protected_regular = 2
+	fs.protected_symlinks = 1
+	* Applying /etc/sysctl.d/99-sysctl.conf ...
+	* Applying /etc/sysctl.d/k8s.conf ...
+	net.bridge.bridge-nf-call-iptables = 1
+	net.bridge.bridge-nf-call-ip6tables = 1
+	net.ipv4.ip_forward = 1
+	* Applying /etc/sysctl.conf ...
+
+lsmod | grep br_netfilter
+	br_netfilter           32768  0
+	bridge                307200  1 br_netfilter
+
+lsmod | grep overlay
+	overlay               151552  0
+
+sysctl net.bridge.bridge-nf-call-iptables net.bridge.bridge-nf-call-ip6tables net.ipv4.ip_forward
+	call-ip6tables net.ipv4.ip_forward
+	net.bridge.bridge-nf-call-iptables = 1
+	net.bridge.bridge-nf-call-ip6tables = 1
+	net.ipv4.ip_forward = 1
+
+sudo apt-get update
+	Hit:1 http://mirror.cloudlab.zhaw.ch/ubuntu jammy InRelease
+	Hit:2 http://mirror.cloudlab.zhaw.ch/ubuntu jammy-updates InRelease
+	Hit:3 http://mirror.cloudlab.zhaw.ch/ubuntu jammy-backports InRelease
+	Hit:4 https://download.docker.com/linux/ubuntu jammy InRelease
+	Hit:5 http://mirror.cloudlab.zhaw.ch/ubuntu jammy-security InRelease
+	Reading package lists... Done
+
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+	deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /
+
+sudo apt-get update
+
+sudo apt-get install -y kubelet kubeadm kubectl
+
+	kubelet set on hold.
+	kubeadm set on hold.
+	kubectl set on hold.
+
+sudo apt-get update
+
+sudo apt-get install -y software-properties-common curl
+
+PROJECT_PATH=prerelease:/main
+
+curl -fsSL https://pkgs.k8s.io/addons:/cri-o:/$PROJECT_PATH/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
+
+sudo echo "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://pkgs.k8s.io/addons:/cri-o:/$PROJECT_PATH/deb/ /" |    sudo tee /etc/apt/sources.list.d/cri-o.list
+	deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://pkgs.k8s.io/addons:/cri-o:/prerelease:/main/deb/ /
+
+sudo add-apt-repository ppa:criu/ppa
+
+sudo apt update
+
+sudo apt-get install -y cri-o criu
+
+sudo vim /etc/crio/crio.conf.d/10-crio.conf
+	[crio.image]
+	signature_policy = "/etc/crio/policy.json"	
+
+	[crio.runtime]
+	default_runtime = "runc"
+	enable_criu_support = true
+
+	[crio.runtime.runtimes.crun]
+	runtime_path = "/usr/bin/crio-crun"
+	monitor_path = "/usr/bin/crio-conmon"
+	allowed_annotations = [
+	    "io.containers.trace-syscall",
+	]
+
+	[crio.runtime.runtimes.runc]
+	runtime_path = "/usr/bin/crio-runc"
+	monitor_path = "/usr/bin/crio-conmon"
+
+sudo systemctl daemon-reload
+
+sudo systemctl enable crio
+
+sudo systemctl start crio.service
+
+swapoff -a
+
+modprobe br_netfilter
+
+sudo sysctl -w net.ipv4.ip_forward=1
+	net.ipv4.ip_forward = 1
+
+sudo vim /etc/kubernetes/kubeadm-config.yaml
+	apiVersion: kubelet.config.k8s.io/v1beta1
+	kind: KubeletConfiguration
+	featureGates:
+	  ContainerCheckpoint: true
+	---
+	apiVersion: kubeadm.k8s.io/v1beta3
+	kind: ClusterConfiguration
+	apiServer:
+	  extraArgs:
+	    feature-gates: "ContainerCheckpoint=true"
+	controllerManager:
+	  extraArgs:
+	    feature-gates: "ContainerCheckpoint=true"
+	scheduler:
+	  extraArgs:
+	    feature-gates: "ContainerCheckpoint=true"
+	---
+	apiVersion: kubeadm.k8s.io/v1beta3
+	kind: InitConfiguration
+	nodeRegistration:
+	  criSocket: "unix:///var/run/crio/crio.sock"
+
+sudo kubeadm init --config=kubeadm-config.yaml
+
+mkdir -p $HOME/.kube
+
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

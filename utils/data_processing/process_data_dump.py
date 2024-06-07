@@ -23,11 +23,12 @@ def plot_hist_with_outliers(data):
     
     for column in columns:
         plt.figure(figsize=(10, 6))
-        plt.hist(data[column].dropna(), bins=20, edgecolor='k', alpha=0.7)
-        plt.title(f'Histogram of {column}-Time for a Migration of a CPU Intensive Application')
-        plt.xlabel(column)
+        plt.hist(data[column].dropna(), bins=15, edgecolor='k', alpha=0.7)
+        plt.title(f'Histogram of {column}-Time for a Migration of a Disk Intensive Application with 3452 KB Load')
+        plt.xlabel(f'{column} [ms]')
         plt.ylabel('Frequency')
         plt.grid(True)
+        plt.savefig(f'{column}_plot.pdf', bbox_inches='tight')
         plt.show()
         
 def plot_hist_without_outliers(data):
@@ -37,8 +38,8 @@ def plot_hist_without_outliers(data):
         column_data_no_outliers = remove_outliers(data, column)
         plt.figure(figsize=(10, 6))
         plt.hist(column_data_no_outliers[column].dropna(), bins=20, edgecolor='k', alpha=0.7)
-        plt.title(f'Histogram of {column}-Time for a Migration of a CPU Intensive Application without outliers')
-        plt.xlabel(column)
+        plt.title(f'Histogram of {column}-Time for a Migration of a Disk Intensive Application without outliers')
+        plt.xlabel(f'{column} [ms]')
         plt.ylabel('Frequency')
         plt.grid(True)
         plt.show()
@@ -48,12 +49,12 @@ def plot_scatter_with_outliers(data):
     
     for column in columns:
         plt.plot(data[column])
-        plt.title(f'{column}-Time for Migrations of a CPU Intensive Application')
+        plt.title(f'{column}-Time for Migrations of a Memory Intensive Application with 83.98 MB Load')
         plt.xlabel('Iteration')
-        plt.ylabel('Duration (ms)')
-    
-        plt.legend()
+        plt.ylabel('Duration [ms]')
         plt.grid(True)
+       # plt.savefig(f'{column}_plot.pdf', bbox_inches='tight')
+
         plt.show()
         
 def plot_scatter_without_outliers(data):
@@ -62,15 +63,15 @@ def plot_scatter_without_outliers(data):
     for column in columns:
         columns = remove_outliers(data, column)
         plt.plot(data[column])
-        plt.title(f'{column}-Time for Migrations of a CPU Intensive Application without outliers')
+        plt.title(f'{column}-Time for Migrations of a Memory Intensive Application without outliers')
         plt.xlabel('Iteration')
-        plt.ylabel('Duration (ms)')
-
+        plt.ylabel('Duration [ms]')
         plt.grid(True)
+        #plt.savefig(f'{column}_plot.pdf', bbox_inches='tight')
         plt.show()
 
-input_file_path = 'C:/Users/rinik/OneDrive/Desktop/ZHAW//07_HS23/PA/ContMigration/utils/data_extraction/data_dump/cpu-0_migration_times.csv'
-output_file_path = 'C:/Users/rinik/OneDrive/Desktop/ZHAW//07_HS23/PA/ContMigration/utils/data_processing/cpu/cpu-0_migration-times.csv'
+input_file_path = 'C:/Users/rinik/OneDrive/Desktop/ZHAW//07_HS23/PA/ContMigration/utils/data_extraction/data_dump/mongo-0_migration_times_100k.csv'
+output_file_path = 'C:/Users/rinik/OneDrive/Desktop/ZHAW//07_HS23/PA/ContMigration/utils/data_processing/disk/mongo100k_migration-times.csv'
 
 data_raw = pd.read_csv(input_file_path, delimiter=',')
 
@@ -78,9 +79,9 @@ data_raw = pd.read_csv(input_file_path, delimiter=',')
 data_raw_stats = calc_stats(data_raw)
 
 plot_hist_with_outliers(data_raw)
-plot_hist_without_outliers(data_raw)
-plot_scatter_with_outliers(data_raw)
-plot_scatter_without_outliers(data_raw)
+#plot_hist_without_outliers(data_raw)
+#plot_scatter_with_outliers(data_raw)
+#plot_scatter_without_outliers(data_raw)
 
 data_raw_stats.to_csv(output_file_path)
 

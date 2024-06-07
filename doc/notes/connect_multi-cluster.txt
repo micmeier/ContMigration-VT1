@@ -1,0 +1,40 @@
+connect 2 separate K8 clusters
+
+1) install kubectl on client vm
+
+2) create or modify config file ~/.kube/config -> should look something like this: 
+	apiVersion: v1
+	clusters:
+	- cluster:
+	    certificate-authority-data: <certificate>
+	    server: <api-address>
+	  name: cluster1
+	- cluster:
+	    certificate-authority-data: <certificate>
+	    server: <api-address>
+	  name: cluster2
+	contexts:
+	- context:
+	    cluster: cluster1
+	    user: masterNode1
+	  name: cluster1
+	- context:
+	    cluster: cluster2
+	    user: masterNode2
+	  name: cluster2
+	current-context: cluster2
+	kind: Config
+	preferences: {}
+	users:
+	- name: masterNode1
+	  user:
+	    client-certificate-data: <certificate>
+	    client-key-data: <key>
+	- name: masterNode2
+	  user:
+	    client-certificate-data: <certificate>
+	    client-key-data: <key>
+	
+All the necessary information (keys and certs) is found on the config files in the respective clusters in ~/.kube/config
+
+3) use "kubectl config use-context <cluster>" to switch between clusters and use kubectl commands
