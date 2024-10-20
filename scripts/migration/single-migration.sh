@@ -7,7 +7,7 @@ then
 fi
 
 podName=$1
-index=0
+index=1
 
 echo "Index, Checkpoint Creation, Checkpoint Location, Permission Change, Image Creation, Image Push, Pod Ready, Total" >> /home/ubuntu/meierm78/ContMigration-VT1/scripts/utils/data_extraction/data_dump/${podName}_migration_times.csv
 
@@ -15,8 +15,6 @@ echo "Index, Checkpoint Creation, Checkpoint Location, Permission Change, Image 
 
 echo "------------------------------------------------------------------"
 echo "-- Starting new migration --"
-
-index=$((index + 1))
 
 kubectl config use-context cluster1
 
@@ -29,7 +27,7 @@ destCluster="cluster2"
 # Step 2: Get pod, container names, and node where the pod is running
 containername=$(kubectl get pods $podName -o jsonpath='{.spec.containers[0].name}')
 nodename=$(kubectl get pods $podName -o jsonpath='{.spec.nodeName}')
-
+appName=$(kubectl get pods $podName -o jsonpath='{.metadata.labels.app}')
 # Step 3: Checkpoint via curl
 
 echo "------------------------------------------------------------------"
@@ -108,11 +106,9 @@ kubectl config use-context $destCluster
 echo "-- Applying restore yaml file --"
 
 startTime=$(date +%s%3N)
-kubectl apply -f /home/ubuntu/meierm78/ContMigration-VT1/scripts/migration/yaml/restore_$podName.yaml
+kubectl apply -f /home/ubuntu/meierm78/ContMigration-VT1/scripts/migration/yaml/restore_$appName.yaml
 
-newPodName=$(echo $podName | cut -d'-' -f1)
-newStsName=$newPodName-restore
-newPodName=$newPodName-restore
+newPodName=$appName-restore
 
 echo "-- Waiting for the new pod \"$newPodName\" to be ready --"
 kubectl wait --for=jsonpath='{.status.phase}'=Running pod/$newPodName
