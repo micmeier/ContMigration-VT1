@@ -77,6 +77,8 @@ echo "-- Building new image --"
 
 startTime=$(date +%s%3N)
 # Step 5: Convert checkpoint to image
+echo "Checkpoint image name: $checkpoint_image_name"
+echo "Checkpoint file: $checkpointfile"
 newcontainer=$(buildah from $checkpoint_image_name)
 buildah add $newcontainer $checkpointfile /
 buildah config --annotation=io.kubernetes.cri-o.annotations.checkpoint.name=${containername} $newcontainer
