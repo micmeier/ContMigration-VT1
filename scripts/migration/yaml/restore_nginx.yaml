@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-restore
+  annotations:
+    io.kubernetes.cri-o.TrySkipVolumeSELinuxLabel: "true"
+  labels:
+    app: nginx-restore
+spec:
+  containers:
+  - name: nginx-restore
+    image: 10.0.0.180:5000/nginx:checkpoint
+    imagePullPolicy: Always
+    securityContext:
+      seLinuxOptions:
+        level: s0:c0
