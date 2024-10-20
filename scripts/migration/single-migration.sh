@@ -112,7 +112,7 @@ kubectl apply -f /home/ubuntu/meierm78/ContMigration-VT1/scripts/migration/yaml/
 
 newPodName=$(echo $podName | cut -d'-' -f1)
 newStsName=$newPodName-restore
-newPodName=$newPodName-restore-0
+newPodName=$newPodName-restore
 
 echo "-- Waiting for the new pod \"$newPodName\" to be ready --"
 kubectl wait --for=jsonpath='{.status.phase}'=Running pod/$newPodName
