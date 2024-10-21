@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: falco
+  namespace: falco
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: falco
+  template:
+    metadata:
+      labels:
+        app: falco
+    spec:
+      containers:
+        - name: falco
+          image: falcosecurity/falco:0.39.1
+          stdin: true
+          tty: true
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: docker-sock
+              mountPath: /host/var/run/docker.sock
+            - name: host-dev
+              mountPath: /host/dev
+            - name: host-proc
+              mountPath: /host/proc
+              readOnly: true
+            - name: host-boot
+              mountPath: /host/boot
+              readOnly: true
+            - name: host-modules
+              mountPath: /host/lib/modules
+              readOnly: true
+            - name: host-usr
+              mountPath: /host/usr
+              readOnly: true
+            - name: host-etc
+              mountPath: /host/etc
+              readOnly: true
+      volumes:
+        - name: docker-sock
+          hostPath:
+            path: /var/run/docker.sock
+        - name: host-dev
+          hostPath:
+            path: /dev
+        - name: host-proc
+          hostPath:
+            path: /proc
+        - name: host-boot
+          hostPath:
+            path: /boot
+        - name: host-modules
+          hostPath:
+            path: /lib/modules
+        - name: host-usr
+          hostPath:
+            path: /usr
+        - name: host-etc
+          hostPath:
+            path: /etc

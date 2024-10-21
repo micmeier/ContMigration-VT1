@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: falco
+  namespace: default  # Change this to your desired namespace if necessary
+spec:
+  containers:
+    - name: falco
+      image: falcosecurity/falco:0.39.1
+      stdin: true
+      tty: true
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - name: docker-sock
+          mountPath: /host/var/run/docker.sock
+        - name: host-dev
+          mountPath: /host/dev
+        - name: host-proc
+          mountPath: /host/proc
+          readOnly: true
+        - name: host-boot
+          mountPath: /host/boot
+          readOnly: true
+        - name: host-modules
+          mountPath: /host/lib/modules
+          readOnly: true
+        - name: host-usr
+          mountPath: /host/usr
+          readOnly: true
+        - name: host-etc
+          mountPath: /host/etc
+          readOnly: true
+  volumes:
+    - name: docker-sock
+      hostPath:
+        path: /var/run/docker.sock
+    - name: host-dev
+      hostPath:
+        path: /dev
+    - name: host-proc
+      hostPath:
+        path: /proc
+    - name: host-boot
+      hostPath:
+        path: /boot
+    - name: host-modules
+      hostPath:
+        path: /lib/modules
+    - name: host-usr
+      hostPath:
+        path: /usr
+    - name: host-etc
+      hostPath:
+        path: /etc
