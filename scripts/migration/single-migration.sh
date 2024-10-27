@@ -118,9 +118,16 @@ migrationTotalTime=$(($(date +%s%3N) - $migrationStartTime))
 
 echo "${index}, ${checkpointTime}, ${latestCheckpointTime}, ${permissionTime}, ${newImageTime}, ${pushImageTime}, ${podReadyTime}, ${migrationTotalTime}" >> /home/ubuntu/meierm78/ContMigration-VT1/scripts/utils/data_extraction/data_dump/${podName}_migration_times.csv
 
-echo "-- newPodName running --"
+echo "-- $newPodName running --"
+
+echo "-- Migration complete --"
 
 echo "------------------------------------------------------------------"
+
+echo "Delete the old pod"
+
+kubectl config use-context cluster1
+kubectl delete pod $podName
 
 sleep 5
 
