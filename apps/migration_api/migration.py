@@ -1,6 +1,4 @@
-from urllib.request import Request
-
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 import subprocess
 
 app = FastAPI()
