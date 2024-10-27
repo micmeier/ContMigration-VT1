@@ -37,12 +37,12 @@ echo "-- Creating checkpoint for $podName on $nodename --"
 migrationStartTime=$(date +%s%3N)
 
 startTime=$(date +%s%3N)
-curl -sk -X POST "https://$nodename:10250/checkpoint/default/${podName}/${containername}" \
+checkpoint_output= $(curl -sk -X POST "https://$nodename:10250/checkpoint/default/${podName}/${containername}" \
   --key /home/ubuntu/.kube/pki/$currentCluster-apiserver-kubelet-client.key \
   --cacert /home/ubuntu/.kube/pki/$currentCluster-ca.crt \
-  --cert /home/ubuntu/.kube/pki/$currentCluster-apiserver-kubelet-client.crt
+  --cert /home/ubuntu/.kube/pki/$currentCluster-apiserver-kubelet-client.crt)
 checkpointTime=$(($(date +%s%3N) - $startTime))
-
+echo "checkpoint output: $checkpoint_output"
 echo "-- Checkpoint created --"
 
 echo "------------------------------------------------------------------"

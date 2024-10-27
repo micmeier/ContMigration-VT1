@@ -8,7 +8,7 @@ async def trigger_migration():
     try:
         # Run the migration script located at /host/migration.sh
         #result = subprocess.run(["/home/ubuntu/ContMigration/scripts/migration/single-migration.sh"], check=True, capture_output=True, text=True)
-        result = subprocess.run(["../../scripts/migration/single-migration.sh"], check=True, capture_output=True, text=True)
+        result = subprocess.run(["../../scripts/migration/single-migration.sh", "nginx-7bf5d9d764-42gms"], check=True, capture_output=True, text=True)
 
         # Return the result of the script execution
         return {"message": "Migration script executed successfully", "output": result.stdout}
