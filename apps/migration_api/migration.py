@@ -18,7 +18,7 @@ async def handle_warning(request: Request):
     if rule in ruleToTriggerMigration:
         print(f"Security event with priority {priority}and rule {rule} received from {hostname}")
         print(f"Migrating pod {k8s_pod_name} to a secure cluster")
-        return await trigger_migration()
+        return await trigger_migration(k8s_pod_name)
 
 
 async def trigger_migration(k8s_pod_name):
