@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: atomicred
+  name: atomic-red
   namespace: atomic-red
   labels:
     app: atomic-red
