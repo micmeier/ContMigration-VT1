@@ -2,15 +2,15 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: atomic-red-restore
-  annotations:
-    io.kubernetes.cri-o.TrySkipVolumeSELinuxLabel: "true"
   labels:
     app: atomic-red-restore
 spec:
   containers:
-    - name: atomic-red-restore
+    - name: atomic-red
       image: 10.0.0.180:5000/atomicredteam:checkpoint
       imagePullPolicy: Always
+      command: [ "sleep", "3560d" ]
       securityContext:
-        seLinuxOptions:
-          level: s0:c0
+        privileged: true
+  nodeSelector:
+    kubernetes.io/os: linux
