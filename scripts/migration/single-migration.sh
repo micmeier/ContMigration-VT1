@@ -83,7 +83,7 @@ buildah config --annotation=io.kubernetes.cri-o.annotations.checkpoint.name=${co
 newImageTime=$(($(date +%s%3N) - $startTime))
 
 checkpoint_image_name=$(kubectl get pod $podName -o jsonpath='{.spec.containers[0].image}' | cut -d'/' -f 2 | cut -d':' -f 1)
-
+echo "Checkpoint image name: $checkpoint_image_name"
 echo "-- Commiting new image --"
 
 startTime=$(date +%s%3N)
@@ -137,7 +137,7 @@ echo "-- Checkpoint data collected --"
 
 echo "------------------------------------------------------------------"
 
-checkpointDir=/home/ubuntu/nfs/checkpoints/${nodename}/checkpoint-${podName}_default-${containername}-*.tar
+checkpointDir=/home/ubuntu/nfs/checkpoints/${nodename}/checkpoint-*_default-${containername}-*.tar
 echo "-- Deleting oldest checkpoint if more than 5 are saved --"
 
 if  [ $(ls $checkpointDir | wc -l) -gt 5 ]

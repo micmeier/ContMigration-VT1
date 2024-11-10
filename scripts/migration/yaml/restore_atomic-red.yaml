@@ -9,7 +9,7 @@ metadata:
 spec:
   containers:
     - name: atomic-red-restore
-      image: 10.0.0.180:5000/redcanary/invoke-atomicredteam:checkpoint
+      image: 10.0.0.180:5000/atomicredteam:checkpoint
       imagePullPolicy: Always
       securityContext:
         seLinuxOptions:

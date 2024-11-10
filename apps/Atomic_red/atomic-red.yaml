@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: atomic-red
-          image: 10.0.0.180:5000/redcanary/invoke-atomicredteam
+          image: 10.0.0.180:5000/atomicredteam
           imagePullPolicy: "IfNotPresent"
           command: ["sleep", "3560d"]
           securityContext:
