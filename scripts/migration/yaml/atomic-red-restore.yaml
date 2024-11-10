@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: atomic-red-restore
+  annotations:
+    io.kubernetes.cri-o.TrySkipVolumeSELinuxLabel: "true"
+  labels:
+    app: atomic-red-restore
+spec:
+  containers:
+    - name: atomic-red-restore
+      image: 10.0.0.180:5000/redcanary/invoke-atomicredteam:checkpoint
+      imagePullPolicy: Always
+      securityContext:
+        seLinuxOptions:
+          level: s0:c0

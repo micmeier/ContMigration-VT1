@@ -6,7 +6,7 @@ metadata:
   labels:
     app: atomicred
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: atomicred
@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: atomicred
-          image: issif/atomic-red:latest
+          image: localhost:5000/redcanary/invoke-atomicredteam
           imagePullPolicy: "IfNotPresent"
           command: ["sleep", "3560d"]
           securityContext:
