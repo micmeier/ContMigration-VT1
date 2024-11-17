@@ -8,9 +8,11 @@ metadata:
     io.kompose.service: spring
   name: spring
 spec:
+  type: NodePort      # Change the service type to NodePort
   ports:
     - name: "8080"
-      port: 8080
-      targetPort: 8080
+      port: 8080        # The port exposed by the service
+      targetPort: 8080  # The port your app is listening on inside the container
+      nodePort: 30080    # The port exposed on the worker nodes (optional, but you can define a specific port)
   selector:
     io.kompose.service: spring
