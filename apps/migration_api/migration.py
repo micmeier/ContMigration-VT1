@@ -4,7 +4,8 @@ import subprocess
 app = FastAPI()
 
 ruleToTriggerMigration = [
-    'Read sensitive file untrusted'
+    'Read sensitive file untrusted',
+    'Drop and execute new binary in container'
 ]
 
 @app.post("/trigger-migration/")
