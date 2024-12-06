@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: redis
+  name: vuln-redis
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: redis
+      app: vuln-redis
   template:
     metadata:
       labels:
-        app: redis
+        app: vuln-redis
     spec:
       containers:
         - image: 10.0.0.180:5000/vuln-redis
-          name: redis
+          name: vuln-redis
           ports:
             - containerPort: 6379
               protocol: TCP
