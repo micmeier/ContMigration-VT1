@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vuln-redis-restore
+  annotations:
+    io.kubernetes.cri-o.TrySkipVolumeSELinuxLabel: "true"
+  labels:
+    app: nginx-restore
+spec:
+  containers:
+    - name: vuln-redis-restore
+      image: 10.0.0.180:5000/vuln-redis:checkpoint
+      imagePullPolicy: Always
+      securityContext:
+        seLinuxOptions:
+          level: s0:c0

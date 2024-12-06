@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: spring
+  name: vuln-spring
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: spring
+      app: vuln-spring
   template:
     metadata:
       labels:
-        app: spring
+        app: vuln-spring
     spec:
       containers:
         - image: 10.0.0.180:5000/vuln-spring
-          name: spring
+          name: vuln-spring
           ports:
             - containerPort: 8080
               protocol: TCP
