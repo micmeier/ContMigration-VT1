@@ -13,7 +13,7 @@ spec:
         app: spring
     spec:
       containers:
-        - image: vulhub/spring-cloud-function:3.2.2
+        - image: 10.0.0.180:5000/vuln-spring
           name: spring
           ports:
             - containerPort: 8080

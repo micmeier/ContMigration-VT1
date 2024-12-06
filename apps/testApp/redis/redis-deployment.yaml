@@ -13,7 +13,7 @@ spec:
         app: redis
     spec:
       containers:
-        - image: vulhub/redis:5.0.7
+        - image: 10.0.0.180:5000/vuln-redis
           name: redis
           ports:
             - containerPort: 6379
