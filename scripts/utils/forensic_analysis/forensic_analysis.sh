@@ -75,7 +75,7 @@ extract_checkpoint() {
     }
     chmod -R 770 "$TMP_DIR"
     echo "----- Changed files -----" >> "$OUTPUT_DIR/forensic_report.txt"
-    tar xvf rootfs-diff.tar >> "$OUTPUT_DIR/forensic_report.txt" || {
+    tar xvf "$TMP_DIR/rootfs-diff.tar" >> "$OUTPUT_DIR/forensic_report.txt" || {
         echo "Error: Failed to extract rootfs-diff file."
         exit 1
     }
