@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # Check if a checkpoint file is provided
-if [ "$#" -ne 1 ]; then
+if [ "$#" -ne 2 ]; then
     echo "Usage: $0 <path_to_checkpoint_file>"
     exit 1
 fi
 
 # Set variables
 CHECKPOINT_FILE="$1"
-OUTPUT_DIR="/home/ubuntu/forensic_analysis"
-TMP_DIR="/home/ubuntu/forensic_analysis/temp"
+OUTPUT_DIR="$2"
+TMP_DIR="$OUTPUT_DIR/temp"
 
 # Step 1: Prepare environment
 prepare_environment() {

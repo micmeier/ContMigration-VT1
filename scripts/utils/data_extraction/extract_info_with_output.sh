@@ -13,14 +13,14 @@ convert_to_ms() {
 }
 
 # Check if the required argument is provided
-if [ $# -ne 2 ]; then
+if [ $# -ne 3 ]; then
   echo "Usage: $0 <checkpoint file>"
   exit 1
 fi
 
 checkpoint_file=$1
 index=$2
-output_dir="/home/ubuntu/ContMigration/utils/data_extraction/extracted_data"
+output_dir=$3
 
 # Create the output directory if it doesn't exist
 #mkdir -p "$output_dir"
