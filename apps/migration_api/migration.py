@@ -11,6 +11,7 @@ ruleToTriggerMigration = [
     'Drop and execute new binary in container',
     'Redirect STDOUT/STDIN to Network Connection in Container'
 ]
+triggeredMigrations = []
 
 @app.post("/trigger-migration/")
 async def handle_warning(request: Request):
@@ -21,13 +22,14 @@ async def handle_warning(request: Request):
     k8s_pod_name = body.get("output_fields", {}).get("k8s.pod.name")
     container_name = body.get("output_fields", {}).get("container.name")
 
-    if rule in ruleToTriggerMigration:
+    if rule in ruleToTriggerMigration and k8s_pod_name not in triggeredMigrations:
+        triggeredMigrations.append(k8s_pod_name)
         print(f"Security event with priority {priority} and rule {rule} received from {hostname}")
         print(f"Migrating pod {k8s_pod_name} to a secure cluster")
         os.makedirs(f"/home/ubuntu/contMigration_logs/{container_name}/{k8s_pod_name}", exist_ok=True)
         with open(f"/home/ubuntu/contMigration_logs/{container_name}/{k8s_pod_name}/forensic_report.txt", "w") as file:
             file.write(f"Forensic report of automated container migration of {k8s_pod_name}\n")
-            file.write(f"Migration is triggered because of falco rule of:\n{rule}\n received on {hostname}\n")
+            file.write(f"Migration is triggered because of falco rule of:\n{rule}\nreceived on {hostname}\n")
             file.write(f"Migration is triggered at {datetime.now()}\n\n")
         return await trigger_migration(k8s_pod_name)
 
