@@ -132,6 +132,7 @@ kubectl delete pod $podName
 sleep 5
 
 echo "-- Collecting checkpoint data --"
+mkdir -p "/home/ubuntu/contMigtation_logs/$appName/$podName"
 /home/ubuntu/meierm78/ContMigration-VT1/scripts/utils/data_extraction/extract_info_with_output.sh $checkpointfile $index "/home/ubuntu/contMigtation_logs/$appName/$podName"
 echo "-- Checkpoint data collected --"
 
