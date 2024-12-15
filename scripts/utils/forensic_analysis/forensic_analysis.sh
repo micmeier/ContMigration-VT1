@@ -48,8 +48,8 @@ inspect_checkpoint() {
 
 analyze_process_tree() {
     echo "Extracting process list..."
-    sudo checkpointctl inspect "$CHECKPOINT_FILE" --ps-tree-cmd |  awk '/Process tree/{flag=1; next} flag' >> "$OUTPUT_DIR/forensic_report.txt" || {
-        echo "Error: Failed to extract process list."
+    sudo checkpointctl inspect "$CHECKPOINT_FILE" | awk '/Process tree/{flag=1} /$/ {if (flag) exit} flag' >> "$OUTPUT_DIR/forensic_report.txt" || {
+        echo "Error extracting process tree from checkpoint file"
         exit 1
     }
     echo "Process list saved to $OUTPUT_DIR/forensic_report.txt."
