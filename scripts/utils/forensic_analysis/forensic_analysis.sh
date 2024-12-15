@@ -31,36 +31,50 @@ extract_checkpoint() {
         echo "Error: Failed to extract checkpoint file."
         exit 1
     }
+    chmod -R 770 "$TMP_DIR"
     echo "Checkpoint extracted to $TMP_DIR."
 }
+
+
+inspect_checkpoint() {
+    echo "Getting checkpoint information"
+    echo "----- Checkpoint information -----" > "$OUTPUT_DIR/forensic_report.txt"
+    sudo checkpointctl inspect "$CHECKPOINT_FILE" > "$OUTPUT_DIR/forensic_report.txt" || {
+        echo "Error: Failed to extract process list."
+        exit 1
+    }
+    echo "Checkpoint information saved to $OUTPUT_DIR/forensic_report.txt."
+}
+
+analyze_process_tree() {
+    echo "Extracting process list..."
+    grep -r 'process' "$TMP_DIR/" > "$OUTPUT_DIR/forensic_report.txt" || {
+        echo "Error: Failed to extract process list."
+        exit 1
+    }
+    echo "Process list saved to $OUTPUT_DIR/forensic_report.txt."
+}
+
 
 # Step 3: Analyze checkpoint data
 # This function extracts filesystem metadata from the checkpoint file and saves it to the output directory.
 analyze_filesystem_metadata() {
     echo "Analyzing filesystem metadata..."
-    tar -tf "$CHECKPOINT_FILE" > "$OUTPUT_DIR/filesystem_metadata.txt" || {
+    tar -tf "$CHECKPOINT_FILE" > "$OUTPUT_DIR/forensic_report.txt" || {
         echo "Error: Failed to analyze filesystem metadata."
         exit 1
     }
-    echo "Filesystem metadata saved to $OUTPUT_DIR/filesystem_metadata.txt."
+    echo "Filesystem metadata saved to $OUTPUT_DIR/forensic_report.txt."
 }
 
-analyze_process_list() {
-    echo "Extracting process list..."
-    grep -r 'process' "$TMP_DIR/" > "$OUTPUT_DIR/process_list.txt" || {
-        echo "Error: Failed to extract process list."
-        exit 1
-    }
-    echo "Process list saved to $OUTPUT_DIR/process_list.txt."
-}
 
 analyze_network_activity() {
     echo "Analyzing network activity..."
-    grep -r 'network' "$TMP_DIR/" > "$OUTPUT_DIR/network_activity.txt" || {
+    grep -r 'network' "$TMP_DIR/" > "$OUTPUT_DIR/forensic_report.txt" || {
         echo "Error: Failed to analyze network activity."
         exit 1
     }
-    echo "Network activity saved to $OUTPUT_DIR/network_activity.txt."
+    echo "Network activity saved to $OUTPUT_DIR/forensic_report.txt."
 }
 
 # Step 4: Data interpretation
@@ -86,7 +100,7 @@ interpret_data() {
 main() {
     prepare_environment
     extract_checkpoint
-    # analyze_filesystem_metadata
+    inspect_checkpoint
     # analyze_process_list
     # analyze_network_activity
     # interpret_data
