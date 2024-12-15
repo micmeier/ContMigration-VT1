@@ -20,23 +20,11 @@ prepare_environment() {
 }
 
 # Step 2: Extract container checkpoint
-extract_checkpoint() {
+inspect_checkpoint() {
     if [ ! -f "$CHECKPOINT_FILE" ]; then
         echo "Error: Checkpoint file $CHECKPOINT_FILE does not exist."
         exit 1
     fi
-
-    echo "Extracting container checkpoint..."
-    tar -xf "$CHECKPOINT_FILE" -C "$TMP_DIR" || {
-        echo "Error: Failed to extract checkpoint file."
-        exit 1
-    }
-    chmod -R 770 "$TMP_DIR"
-    echo "Checkpoint extracted to $TMP_DIR."
-}
-
-
-inspect_checkpoint() {
     echo "Getting checkpoint information"
     echo "----- Checkpoint information -----" >> "$OUTPUT_DIR/forensic_report.txt"
     sudo checkpointctl inspect "$CHECKPOINT_FILE" >> "$OUTPUT_DIR/forensic_report.txt" || {
@@ -79,6 +67,20 @@ analyze_files() {
     echo "Open files saved to $OUTPUT_DIR/forensic_report.txt."
 }
 
+extract_checkpoint() {
+    echo "Extracting container checkpoint..."
+    tar -xf "$CHECKPOINT_FILE" -C "$TMP_DIR" || {
+        echo "Error: Failed to extract checkpoint file."
+        exit 1
+    }
+    chmod -R 770 "$TMP_DIR"
+    echo "----- Changed files -----" >> "$OUTPUT_DIR/forensic_report.txt"
+    tar xvf rootfs-diff.tar >> "$OUTPUT_DIR/forensic_report.txt" || {
+        echo "Error: Failed to extract rootfs-diff file."
+        exit 1
+    }
+    echo "Checkpoint extracted to $TMP_DIR."
+}
 
 analyze_network_activity() {
     echo "Analyzing network activity..."
@@ -111,11 +113,11 @@ interpret_data() {
 # Main function to run the script
 main() {
     prepare_environment
-    extract_checkpoint
     inspect_checkpoint
     analyze_process_tree
     analyze_sockets
     analyze_files
+    extract_checkpoint
 }
 
 # Run the script
