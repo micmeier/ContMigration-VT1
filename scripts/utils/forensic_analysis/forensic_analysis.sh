@@ -8,8 +8,8 @@ fi
 
 # Set variables
 CHECKPOINT_FILE="$1"
-OUTPUT_DIR="home/ubuntu/forensic_analysis"
-TMP_DIR="home/ubuntu/forensic_analysis/temp"
+OUTPUT_DIR="/home/ubuntu/forensic_analysis"
+TMP_DIR="/home/ubuntu/forensic_analysis/temp"
 
 # Step 1: Prepare environment
 prepare_environment() {
