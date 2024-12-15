@@ -103,7 +103,7 @@ main() {
     prepare_environment
     extract_checkpoint
     inspect_checkpoint
-    # analyze_process_list
+    analyze_process_tree
     # analyze_network_activity
     # interpret_data
 }
