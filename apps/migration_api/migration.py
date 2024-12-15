@@ -8,7 +8,8 @@ app = FastAPI()
 
 ruleToTriggerMigration = [
     'Read sensitive file untrusted',
-    'Drop and execute new binary in container'
+    'Drop and execute new binary in container',
+    'Redirect STDOUT/STDIN to Network Connection in Container'
 ]
 
 @app.post("/trigger-migration/")
