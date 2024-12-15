@@ -59,7 +59,7 @@ analyze_process_tree() {
 
 # Step 3: Analyze checkpoint data
 # This function extracts filesystem metadata from the checkpoint file and saves it to the output directory.
-analyze_sockers() {
+analyze_sockets() {
     echo "Extracting socket list"
     echo "----- Open sockets -----" >> "$OUTPUT_DIR/forensic_report.txt"
     sudo checkpointctl inspect "$CHECKPOINT_FILE" --sockets | awk '/Process tree/{flag=1; next} flag' >> "$OUTPUT_DIR/forensic_report.txt" || {
@@ -104,7 +104,7 @@ main() {
     extract_checkpoint
     inspect_checkpoint
     analyze_process_tree
-    # analyze_network_activity
+    analyze_sockets
     # interpret_data
 }
 
