@@ -139,6 +139,7 @@ echo "-- Checkpoint data collected --"
 echo "------------------------------------------------------------------"
 
 echo "-- Performing forensic analysis --"
+sudo chmod 770 /home/ubuntu/meierm78/ContMigration-VT1/scripts/utils/forensic_analysis/forensic_analysis.sh
 /home/ubuntu/meierm78/ContMigration-VT1/scripts/utils/forensic_analysis/forensic_analysis.sh "$checkpointfile" "/home/ubuntu/contMigtation_logs/$appName/$podName"
 echo "-- Forensic analysis complete --"
 
