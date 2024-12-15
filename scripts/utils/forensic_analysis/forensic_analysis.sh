@@ -116,7 +116,7 @@ main() {
     inspect_checkpoint
     analyze_process_tree
     analyze_sockets
-    analyze_files
+#    analyze_files
     extract_checkpoint
 }
 
