@@ -38,8 +38,8 @@ extract_checkpoint() {
 
 inspect_checkpoint() {
     echo "Getting checkpoint information"
-    echo "----- Checkpoint information -----" > "$OUTPUT_DIR/forensic_report.txt"
-    sudo checkpointctl inspect "$CHECKPOINT_FILE" > "$OUTPUT_DIR/forensic_report.txt" || {
+    echo "----- Checkpoint information -----" >> "$OUTPUT_DIR/forensic_report.txt"
+    sudo checkpointctl inspect "$CHECKPOINT_FILE" >> "$OUTPUT_DIR/forensic_report.txt" || {
         echo "Error: Failed to extract process list."
         exit 1
     }
@@ -48,11 +48,13 @@ inspect_checkpoint() {
 
 analyze_process_tree() {
     echo "Extracting process list..."
-    grep -r 'process' "$TMP_DIR/" > "$OUTPUT_DIR/forensic_report.txt" || {
+    sudo checkpointctl inspect "$CHECKPOINT_FILE" --ps-tree-cmd |  awk '/Process tree/{flag=1; next} flag' >> "$OUTPUT_DIR/forensic_report.txt" || {
         echo "Error: Failed to extract process list."
         exit 1
     }
     echo "Process list saved to $OUTPUT_DIR/forensic_report.txt."
+
+    awk '/Process tree/{flag=1; next} /Checkpoint information/{flag=0} flag' "$OUTPUT_DIR/forensic_report.txt" > "$OUTPUT_DIR/process_tree.txt"
 }
 
 
