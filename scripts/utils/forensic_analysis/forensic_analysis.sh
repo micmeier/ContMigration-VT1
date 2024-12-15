@@ -53,8 +53,6 @@ analyze_process_tree() {
         exit 1
     }
     echo "Process list saved to $OUTPUT_DIR/forensic_report.txt."
-
-    awk '/Process tree/{flag=1; next} /Checkpoint information/{flag=0} flag' "$OUTPUT_DIR/forensic_report.txt" > "$OUTPUT_DIR/process_tree.txt"
 }
 
 
