@@ -69,6 +69,16 @@ analyze_sockets() {
     echo "Open socket saved to $OUTPUT_DIR/forensic_report.txt."
 }
 
+analyze_files() {
+    echo "Extracting file list"
+    echo "----- Open files -----" >> "$OUTPUT_DIR/forensic_report.txt"
+    sudo checkpointctl inspect "$CHECKPOINT_FILE" --files | awk '/Open files/{flag=1; next} flag' >> "$OUTPUT_DIR/forensic_report.txt" || {
+        echo "Error extracting process tree from checkpoint file"
+        exit 1
+    }
+    echo "Open files saved to $OUTPUT_DIR/forensic_report.txt."
+}
+
 
 analyze_network_activity() {
     echo "Analyzing network activity..."
@@ -105,7 +115,7 @@ main() {
     inspect_checkpoint
     analyze_process_tree
     analyze_sockets
-    # interpret_data
+    analyze_files
 }
 
 # Run the script
