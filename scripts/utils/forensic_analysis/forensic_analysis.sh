@@ -75,39 +75,11 @@ extract_checkpoint() {
     }
     chmod -R 770 "$TMP_DIR"
     echo "----- Changed files -----" >> "$OUTPUT_DIR/forensic_report.txt"
-    tar xvf "$TMP_DIR/rootfs-diff.tar" >> "$OUTPUT_DIR/forensic_report.txt" || {
+    tar xvf "$TMP_DIR/rootfs-diff.tar" -C "$TMP_DIR/changed" >> "$OUTPUT_DIR/forensic_report.txt" || {
         echo "Error: Failed to extract rootfs-diff file."
         exit 1
     }
     echo "Checkpoint extracted to $TMP_DIR."
-}
-
-analyze_network_activity() {
-    echo "Analyzing network activity..."
-    grep -r 'network' "$TMP_DIR/" > "$OUTPUT_DIR/forensic_report.txt" || {
-        echo "Error: Failed to analyze network activity."
-        exit 1
-    }
-    echo "Network activity saved to $OUTPUT_DIR/forensic_report.txt."
-}
-
-# Step 4: Data interpretation
-interpret_data() {
-    echo "Interpreting extracted data..."
-    {
-        echo "Filesystem Metadata:"
-        cat "$OUTPUT_DIR/filesystem_metadata.txt"
-        echo
-
-        echo "Process List:"
-        cat "$OUTPUT_DIR/process_list.txt"
-        echo
-
-        echo "Network Activity:"
-        cat "$OUTPUT_DIR/network_activity.txt"
-    } > "$OUTPUT_DIR/forensic_report.txt"
-
-    echo "Data interpretation complete. Report saved to $OUTPUT_DIR/forensic_report.txt."
 }
 
 # Main function to run the script
