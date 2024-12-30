@@ -1,10 +1,37 @@
 from datetime import datetime
-
+from kubernetes import client, config
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 import subprocess
 import os
 
 app = FastAPI()
+
+origins = [
+    "http://160.85.255.146:4200"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+
+kube_config_path = '/home/ubuntu/.kube/config'
+# Load Kubernetes configuration (ensure kubeconfig is in the default location or provide path)
+config.load_kube_config()
+
+# Initialize the Kubernetes API client
+# client1 is the client of cluster1
+# client2 is the client of cluster2
+client1 = client.CoreV1Api(
+        api_client=config.new_client_from_config(context='cluster1'))
+client2 = client.CoreV1Api(
+    api_client=config.new_client_from_config(context='cluster2'))
 
 ruleToTriggerMigration = [
     'Read sensitive file untrusted',
@@ -12,6 +39,7 @@ ruleToTriggerMigration = [
     'Redirect STDOUT/STDIN to Network Connection in Container'
 ]
 triggeredMigrations = []
+activeClient = client1
 
 @app.post("/trigger-migration/")
 async def handle_warning(request: Request):
@@ -47,6 +75,57 @@ async def trigger_migration(k8s_pod_name):
         raise HTTPException(status_code=500, detail=f"Error executing script: {e.stderr}")
 
 
+# Add an endpoint to get the list of pods in the cluster (for debugging or other purposes)
+@app.get("/k8s/pods/{cluster}")
+async def get_pods(cluster: str):
+    """Get a list of pods in the specified Kubernetes namespace"""
+    set_active_cluster(cluster)
+    try:
+        pods = activeClient.list_namespaced_pod(namespace='default')
+        
+        pod_info = [
+            {"name": pod.metadata.name, "status": pod.status.phase}
+            for pod in pods.items
+        ]
+        
+        return {"pods": pod_info}
+    
+    except client.exceptions.ApiException as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching pods: {e}")
+
+@app.delete("/k8s/pods/{cluster}/{pod_name}")
+async def delete_pod(cluster: str, pod_name: str):
+    """Delete a Kubernetes pod by its name."""
+    set_active_cluster(cluster)
+    try:
+        # Delete the pod
+        response = activeClient.delete_namespaced_pod(
+            name=pod_name,
+            namespace='default'
+        )
+        return {
+            "message": f"Pod '{pod_name}' deleted successfully in cluster '{cluster}'"
+        }
+    except client.exceptions.ApiException as e:
+        # Handle Kubernetes API exceptions
+        raise HTTPException(
+            status_code=e.status,
+            detail=f"Failed to delete pod '{pod_name}' in namespace '{namespace}': {e.reason}",
+        )
+
+
+def set_active_cluster(targetCluster: str):
+    global activeClient
+    if targetCluster == 'cluster1':
+        activeClient = client1
+    elif targetCluster == 'cluster2':
+        activeClient = client2
+    else: 
+        raise ValueError(f"Invalid client choice: {client_choice}")
+
+    
+    
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run("migration:app", host="0.0.0.0", port=8000, reload=True)

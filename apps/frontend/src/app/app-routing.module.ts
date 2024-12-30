@@ -4,16 +4,19 @@ import {OverviewComponent} from './pages/overview/overview.component';
 import {MigrationComponent} from './pages/migration/migration.component';
 import {LogsComponent} from './pages/logs/logs.component';
 import {ConfigComponent} from './pages/config/config.component';
+import { AppLayoutComponent } from './layout/app.layout.component';
+import { SimulationComponent } from './pages/simulation/simulation.component';
 
 const routes: Routes = [
   {
-    path: '', component: OverviewComponent,
-  },
-  {
-    path: 'migration', component: MigrationComponent,
-  },
-  {
-    path: 'logs', component: LogsComponent,
+    path: '', component: AppLayoutComponent,
+    children: [
+      { path: '', component: OverviewComponent },
+      { path: 'migration', component: MigrationComponent },
+      { path: 'simulation', component: SimulationComponent },
+      { path: 'logs', component: LogsComponent },
+      { path: 'config', component: ConfigComponent}
+    ]
   },
   {
     path: 'config', component: ConfigComponent,

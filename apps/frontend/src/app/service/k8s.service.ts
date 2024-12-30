@@ -1,9 +1,35 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { PodsResponse } from '../model/k8s.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class K8sService {
 
-  constructor() { }
+  private apiUrl = 'http://160.85.255.146:8000'; // Change this to your FastAPI server URL
+
+  constructor(private http: HttpClient) {}
+
+  /**
+   * Get a list of pods and their statuses from the specified cluster.
+   * @param cluster The name of the cluster (e.g., 'cluster1' or 'cluster2')
+   * @returns Observable containing the pods data as PodsResponse.
+   */
+  getPods(cluster: string): Observable<PodsResponse> {
+    const url = `${this.apiUrl}/k8s/pods/${cluster}`;
+    return this.http.get<PodsResponse>(url);
+  }
+
+    /**
+   * Delete a pod with the specified name from the specified cluster.
+   * @param cluster The name of the cluster (e.g., 'cluster1' or 'cluster2')
+   * @param podName The name of the pod (e.g., 'cpu-restore')
+   * @returns Observable containing the pods data as PodsResponse.
+   */
+  deletePod(cluster: string, podName: string): Observable<void> {
+    const url = `${this.apiUrl}/k8s/pods/${cluster}/${podName}`;
+    return this.http.delete<void>(url);
+  }
 }
