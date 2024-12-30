@@ -4,6 +4,8 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 import subprocess
 import os
+from pathlib import Path
+from fastapi.responses import PlainTextResponse, FileResponse
 
 app = FastAPI()
 
@@ -18,8 +20,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
 
 kube_config_path = '/home/ubuntu/.kube/config'
 # Load Kubernetes configuration (ensure kubeconfig is in the default location or provide path)
@@ -40,6 +40,7 @@ ruleToTriggerMigration = [
 ]
 triggeredMigrations = []
 activeClient = client1
+log_directory = "/home/ubuntu/contMigration_logs"
 
 @app.post("/trigger-migration/")
 async def handle_warning(request: Request):
@@ -113,6 +114,21 @@ async def delete_pod(cluster: str, pod_name: str):
             detail=f"Failed to delete pod '{pod_name}' in namespace '{namespace}': {e.reason}",
         )
 
+@app.post("/migrate")
+async def migrate_pod(request: Request):
+    body = await request.json()
+    print(f"Request body: ", body)
+    #Currently source and target are not used because migration is always from cluster1 to cluster2
+    source_cluster = body.get("source_cluster")
+    target_cluster = body.get("target_cluster")
+    
+    pod_name = body.get("pod_name")
+    print(f"Pod name", pod_name)
+    #TODO: Implement the logic to generate forensic report and AI suggestions
+    generate_forensic_report = body.get("forensic_analysis")
+    generate_AI_suggestion = body.get("AI_suggestion")
+
+    return await trigger_migration(pod_name)
 
 def set_active_cluster(targetCluster: str):
     global activeClient
@@ -123,8 +139,91 @@ def set_active_cluster(targetCluster: str):
     else: 
         raise ValueError(f"Invalid client choice: {client_choice}")
 
-    
-    
+
+def get_directory_structure(rootdir):
+    """
+    Creates a nested dictionary that represents the folder structure of rootdir
+    """
+    def create_node(name, path, is_file):
+        node = {
+            "label": name,
+            "data": path.replace(rootdir, "").lstrip("/"),
+            "expandedIcon": "pi pi-folder-open" if not is_file else "pi pi-file",
+            "collapsedIcon": "pi pi-folder" if not is_file else "pi pi-file",
+        }
+        if not is_file:
+            node["children"] = []
+        return node
+
+    def add_children(node, path):
+        for item in os.listdir(path):
+            item_path = os.path.join(path, item)
+            if item == "temp":
+                continue
+            if os.path.isdir(item_path):
+                child_node = create_node(item, item_path, False)
+                add_children(child_node, item_path)
+                node["children"].append(child_node)
+            else:
+                node["children"].append(create_node(item, item_path, True))
+
+    root_node = {"children": []}
+    add_children(root_node, rootdir)
+    return root_node["children"]    
+
+@app.get("/directory-structure")
+async def directory_structure():
+    log_directory = "/home/ubuntu/contMigration_logs"  # Replace with your directory path
+    directory_structure = get_directory_structure(log_directory)
+    return {"data": directory_structure}
+
+@app.get("/view/{file_path:path}")
+async def get_file_content(file_path: str):
+    try:
+        # Resolve the full path of the requested file
+        root_path = Path(log_directory).resolve()
+        requested_file = (root_path / file_path).resolve()
+
+        # Ensure the requested file is within the allowed directory
+        if not requested_file.is_file() or root_path not in requested_file.parents:
+            raise HTTPException(status_code=404, detail="File not found or access denied")
+
+        if requested_file.suffix != ".txt":
+            raise HTTPException(status_code=400, detail="Only text files are allowed")
+
+        # Read and return the content of the file
+        with requested_file.open("r", encoding="utf-8") as file:
+            content = file.read()
+
+        return {"content": content}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
+
+@app.get("/download/{file_path:path}")
+async def download_file(file_path: str):
+    try:
+        # Resolve the full path of the requested file
+        root_path = Path(log_directory).resolve()
+        requested_file = (root_path / file_path).resolve()
+
+        # Ensure the requested file is within the allowed directory and is a .txt file
+        if not requested_file.is_file() or root_path not in requested_file.parents :
+            raise HTTPException(status_code=404, detail="File not found or access denied")
+
+        if requested_file.suffix != ".txt":
+            raise HTTPException(status_code=400, detail="Only text files are allowed")
+
+        # Return the file for download
+        return FileResponse(requested_file, media_type='application/octet-stream', filename=requested_file.name)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
+
 
 if __name__ == "__main__":
     import uvicorn

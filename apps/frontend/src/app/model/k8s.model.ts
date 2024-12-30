@@ -3,6 +3,6 @@ export interface Pod {
     status: string;
   }
   
-  export interface PodsResponse {
-    pods: Pod[];
-  }
+export interface PodsResponse {
+  pods: Pod[];
+}

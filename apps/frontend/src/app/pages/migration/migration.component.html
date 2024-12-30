@@ -1,1 +1,33 @@
-<p>migration works!</p>
+<div class="grid">
+    <div class="col-12 md:col-6 gap-2">
+        <div class="card">
+            <h5>Container migration</h5>
+            <p>Choose the source and target cluster, the pod to migrate and the options for the migration</p>
+            <div class="p-formgrid grid">
+                <div class="field col">
+                    <p-dropdown [options]="sourceCluster" [(ngModel)]="selectedSource" placeholder="Select the source cluster" [style]="{'width': '24em'}"></p-dropdown>
+                </div>
+                <div class="field col">
+                    <p-dropdown [options]="targetCluster" [(ngModel)]="selectedTarget" placeholder="Select the source cluster" [style]="{'width': '24em'}"></p-dropdown>
+                </div>
+            </div>
+            @if(areDropdownsFilled()) {
+                <p-dropdown [options]="podsCluster1" [(ngModel)]="selectedPod" placeholder="Select the pod to migrate" [showClear]="true" [style]="{'width': '24em'}"></p-dropdown>
+            
+                <div class="grid formgrid mb-3 mt-5">
+                    <p-inputSwitch [(ngModel)]="isGeneratingFA" class="mr-5 ml-3"></p-inputSwitch>
+                    <p>Generate forensic analysis</p>
+                </div>
+                <div class="grid formgrid mb-3 mt-5">
+                    <p-inputSwitch [(ngModel)]="isGeneratingAISuggestion" class="mr-5 ml-3"></p-inputSwitch>
+                    <p>Generate AI suggestion</p>
+                </div>    
+                <div class="flex flex-wrap gap-2" style="display: flex; justify-content: flex-end;">
+                    <button pButton label="Reset" (click)="reset()" class="p-button-outlined p-button-secondary"></button>
+                    <button pButton label="Migrate" (click)="migratePod()"></button>
+                </div>
+            }
+        </div>
+        
+    </div>
+</div>

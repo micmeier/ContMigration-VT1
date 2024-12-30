@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { PodsResponse } from '../model/k8s.model';
+import { MigrationRequest } from '../model/migration-request.model';
+import { TreeNode } from 'primeng/api';
 
 @Injectable({
   providedIn: 'root'
@@ -32,4 +34,29 @@ export class K8sService {
     const url = `${this.apiUrl}/k8s/pods/${cluster}/${podName}`;
     return this.http.delete<void>(url);
   }
+
+  migratePod(request: MigrationRequest): Observable<void> {
+    const url = `${this.apiUrl}/migrate`;
+    return this.http.post<void>(url, request);
+  }
+
+  getLogStructure(): Observable<TreeNode[]> {
+    const url = `${this.apiUrl}/directory-structure`;
+    return this.http.get<{ data: TreeNode[] }>(url).pipe(
+      map(response => response.data as TreeNode[])
+    );
+  }
+
+  viewFile(file: TreeNode): Observable<string> {
+    const url = `${this.apiUrl}/view/${file.data}`;
+    return this.http.get<any>(url).pipe(
+      map(response => response.content)
+    );
+  }
+
+  downloadFile(file: TreeNode): Observable<Blob> {
+    const url = `${this.apiUrl}/download/${file.data}`;
+    return this.http.get(url, { responseType: 'blob' });
+  }
+
 }

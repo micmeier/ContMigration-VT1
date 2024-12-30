@@ -12,6 +12,15 @@ import { SimulationComponent } from './pages/simulation/simulation.component';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { DropdownModule } from 'primeng/dropdown';
+import { ToggleButtonModule } from 'primeng/togglebutton';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { TreeModule } from 'primeng/tree';
+import { ScrollPanelModule } from 'primeng/scrollpanel';
+import { ContextMenuModule } from 'primeng/contextmenu';
+import { FormsModule } from '@angular/forms';
+import { MessageService } from 'primeng/api';
 
 @NgModule({
   declarations: [
@@ -23,13 +32,21 @@ import { ButtonModule } from 'primeng/button';
     SimulationComponent
   ],
   imports: [
-    CommonModule, 
+    CommonModule,
+    FormsModule,
     AppRoutingModule, 
     AppLayoutModule,
     TableModule, 
-    ButtonModule
+    ButtonModule,
+    DropdownModule,
+    InputTextModule,
+    ToggleButtonModule,
+    InputSwitchModule,
+    TreeModule,
+    ContextMenuModule,
+    ScrollPanelModule,
   ],
-  providers: [],
+  providers: [MessageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
