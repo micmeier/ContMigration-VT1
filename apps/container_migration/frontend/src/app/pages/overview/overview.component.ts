@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { K8sService } from '../../service/k8s.service';
-import { catchError, interval, map, Observable, of, startWith, switchMap, take, tap } from 'rxjs';
+import { catchError, interval, map, Observable, of, startWith, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { Pod, PodsResponse } from '../../model/k8s.model';
 
 @Component({
@@ -8,15 +8,23 @@ import { Pod, PodsResponse } from '../../model/k8s.model';
   templateUrl: './overview.component.html',
   styleUrl: './overview.component.scss'
 })
-export class OverviewComponent implements OnInit{
+export class OverviewComponent implements OnInit, OnDestroy{
   
   public podsCluster1!: Pod[];
   public podsCluster2!: Pod[];
+  private destroy$ = new Subject<void>();
+
+
   constructor(private k8sService: K8sService) {}
 
   public ngOnInit(): void {
     this.getPodsCluster1()
     this.getPodsCluster2()
+  }
+
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
 
@@ -34,7 +42,8 @@ export class OverviewComponent implements OnInit{
               return of([] as Pod[]);
             })
           )
-        )
+        ),
+        takeUntil(this.destroy$)
       )
       .subscribe((pods: Pod[]) => {
         this.podsCluster1 = pods;
@@ -54,7 +63,8 @@ export class OverviewComponent implements OnInit{
               return of([] as Pod[]);
             })
           )
-        )
+        ),
+        takeUntil(this.destroy$)
       )
       .subscribe((pods: Pod[]) => {
         this.podsCluster2 = pods;
