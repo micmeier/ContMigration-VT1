@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { K8sService } from '../../service/k8s.service';
 import { MenuItem, MessageService, TreeNode } from 'primeng/api';
+import { LogsService } from '../../service/logs.service';
 
 @Component({
   selector: 'app-logs',
@@ -15,7 +15,7 @@ export class LogsComponent implements OnInit {
   viewFileContent: string = '';
   viewedLabel: string = '';
   
-  constructor(private k8sService: K8sService, private messageService: MessageService) {}
+  constructor(private logService: LogsService, private messageService: MessageService) {}
 
   ngOnInit(): void {
     this.getLogStructure();
@@ -26,14 +26,14 @@ export class LogsComponent implements OnInit {
   }
 
   private getLogStructure() {
-    this.k8sService.getLogStructure().subscribe((data: TreeNode[]) => {
+    this.logService.getLogStructure().subscribe((data: TreeNode[]) => {
       this.files = data;
     });
   }
 
   viewFile(file: TreeNode) {
     if (file.label && file.label.endsWith('.txt')) {
-      this.k8sService.viewFile(file).subscribe((content: string) => {
+      this.logService.viewFile(file).subscribe((content: string) => {
         this.viewFileContent = content;
         this.viewedLabel = file.label!;
       });
@@ -50,7 +50,7 @@ export class LogsComponent implements OnInit {
 
   downloadFile(file: TreeNode) {
     if(file.label && file.label.endsWith('.txt')) {
-      this.k8sService.downloadFile(file).subscribe(blob => {
+      this.logService.downloadFile(file).subscribe((blob: any) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;

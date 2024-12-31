@@ -5,14 +5,14 @@
             <p>Choose the source and target cluster, the pod to migrate and the options for the migration</p>
             <div class="p-formgrid grid">
                 <div class="field col">
-                    <p-dropdown [options]="sourceCluster" [(ngModel)]="selectedSource" placeholder="Select the source cluster" [style]="{'width': '24em'}"></p-dropdown>
+                    <p-dropdown [options]="sourceCluster" [(ngModel)]="selectedSource" placeholder="Select the source cluster" [style]="{'width': '100%'}"></p-dropdown>
                 </div>
                 <div class="field col">
-                    <p-dropdown [options]="targetCluster" [(ngModel)]="selectedTarget" placeholder="Select the source cluster" [style]="{'width': '24em'}"></p-dropdown>
+                    <p-dropdown [options]="targetCluster" [(ngModel)]="selectedTarget" placeholder="Select the source cluster" [style]="{'width': '100%'}"></p-dropdown>
                 </div>
             </div>
             @if(areDropdownsFilled()) {
-                <p-dropdown [options]="podsCluster1" [(ngModel)]="selectedPod" placeholder="Select the pod to migrate" [showClear]="true" [style]="{'width': '24em'}"></p-dropdown>
+                <p-dropdown [options]="podsCluster1" [(ngModel)]="selectedPod" placeholder="Select the pod to migrate" [showClear]="true" [style]="{'width': '100%'}"></p-dropdown>
             
                 <div class="grid formgrid mb-3 mt-5">
                     <p-inputSwitch [(ngModel)]="isGeneratingFA" class="mr-5 ml-3"></p-inputSwitch>

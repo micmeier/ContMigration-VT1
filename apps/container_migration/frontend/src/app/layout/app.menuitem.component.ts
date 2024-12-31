@@ -66,7 +66,7 @@ export class AppMenuitemComponent implements OnInit, OnDestroy {
     key: string = "";
 
     constructor(public layoutService: LayoutService, private cd: ChangeDetectorRef, public router: Router, private menuService: MenuService) {
-        this.menuSourceSubscription = this.menuService.menuSource$.subscribe(value => {
+        this.menuSourceSubscription = this.menuService.menuSource$.subscribe((value: any) => {
             Promise.resolve(null).then(() => {
                 if (value.routeEvent) {
                     this.active = (value.key === this.key || value.key.startsWith(this.key + '-')) ? true : false;
@@ -83,8 +83,8 @@ export class AppMenuitemComponent implements OnInit, OnDestroy {
             this.active = false;
         });
 
-        this.router.events.pipe(filter(event => event instanceof NavigationEnd))
-            .subscribe(params => {
+        this.router.events.pipe(filter((event: any) => event instanceof NavigationEnd))
+            .subscribe((params: any) => {
                 if (this.item.routerLink) {
                     this.updateActiveStateFromRoute();
                 }

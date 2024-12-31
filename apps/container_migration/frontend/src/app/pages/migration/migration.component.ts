@@ -72,10 +72,10 @@ export class MigrationComponent implements OnInit{
     };
     this.k8sService.migratePod(migrationRequest).pipe(
       take(1), // Ensures only one emission is taken
-      tap((response) => {
+      tap((response: any) => {
         console.log('Pod migration successful:', response);
       }),
-      catchError((error) => {
+      catchError((error: any) => {
         console.error('Pod migration failed:', error);
         return of(error);
       })

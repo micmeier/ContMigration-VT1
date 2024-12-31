@@ -10,8 +10,8 @@ import { Pod, PodsResponse } from '../../model/k8s.model';
 })
 export class OverviewComponent implements OnInit{
   
-  public podsCluster1$!: Observable<Pod[]>;
-  public podsCluster2$!: Observable<Pod[]>;
+  public podsCluster1!: Pod[];
+  public podsCluster2!: Pod[];
   constructor(private k8sService: K8sService) {}
 
   public ngOnInit(): void {
@@ -21,9 +21,9 @@ export class OverviewComponent implements OnInit{
 
 
   private getPodsCluster1() {
-    this.podsCluster1$ = interval(5000) // Polling every 5 seconds
+    interval(5000) // Emit every 5 seconds
       .pipe(
-        startWith(0),
+        startWith(0), // Start immediately
         switchMap(() =>
           this.k8sService.getPods('cluster1').pipe(
             map((podResponse: PodsResponse) => {
@@ -31,28 +31,34 @@ export class OverviewComponent implements OnInit{
               return podResponse.pods;
             }),
             catchError(() => {
-              return of([{}] as Pod[]);
+              return of([] as Pod[]);
             })
           )
         )
-      );
+      )
+      .subscribe((pods: Pod[]) => {
+        this.podsCluster1 = pods;
+      });
   }
 
   private getPodsCluster2() {
-    this.podsCluster2$ = interval(5000) // Polling every 5 seconds
+    interval(5000) // Emit every 5 seconds
       .pipe(
-        startWith(0),
+        startWith(0), // Start immediately
         switchMap(() =>
           this.k8sService.getPods('cluster2').pipe(
             map((podResponse: PodsResponse) => {
               return podResponse.pods;
             }),
             catchError(() => {
-              return of([{}] as Pod[]);
+              return of([] as Pod[]);
             })
           )
         )
-      );
+      )
+      .subscribe((pods: Pod[]) => {
+        this.podsCluster2 = pods;
+      });
   }
 
   public deletePod(cluster: string, podName: string): void {
@@ -66,7 +72,7 @@ export class OverviewComponent implements OnInit{
           this.getPodsCluster2();
         }
       }),
-      catchError((error) => {
+      catchError((error: any) => {
         console.error(`Failed to delete pod ${podName} in cluster ${cluster}:`, error);
         return of(error);
       })

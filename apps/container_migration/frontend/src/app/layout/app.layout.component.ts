@@ -50,7 +50,7 @@ export class AppLayoutComponent implements OnDestroy {
             }
         });
 
-        this.router.events.pipe(filter(event => event instanceof NavigationEnd))
+        this.router.events.pipe(filter((event: any) => event instanceof NavigationEnd))
             .subscribe(() => {
                 this.hideMenu();
                 this.hideProfileMenu();

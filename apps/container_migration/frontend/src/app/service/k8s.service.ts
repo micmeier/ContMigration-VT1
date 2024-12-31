@@ -40,23 +40,4 @@ export class K8sService {
     return this.http.post<void>(url, request);
   }
 
-  getLogStructure(): Observable<TreeNode[]> {
-    const url = `${this.apiUrl}/directory-structure`;
-    return this.http.get<{ data: TreeNode[] }>(url).pipe(
-      map(response => response.data as TreeNode[])
-    );
-  }
-
-  viewFile(file: TreeNode): Observable<string> {
-    const url = `${this.apiUrl}/view/${file.data}`;
-    return this.http.get<any>(url).pipe(
-      map(response => response.content)
-    );
-  }
-
-  downloadFile(file: TreeNode): Observable<Blob> {
-    const url = `${this.apiUrl}/download/${file.data}`;
-    return this.http.get(url, { responseType: 'blob' });
-  }
-
 }
