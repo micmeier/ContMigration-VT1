@@ -1,0 +1,35 @@
+.config-badge {
+    border-radius: var(--border-radius);
+    padding: 0.25em 0.5rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.3px;
+}
+  
+.config-true {
+background: #C8E6C9;
+color: #256029;
+}
+
+.config-false {
+background: #FFCDD2;
+color: #C63737;
+}
+
+.config-migrate {
+    background: #B3E5FC;
+    color: #23547B;
+}
+
+.config-log {
+    background: #ECCFFF;
+    color: #694382;
+}
+
+
+
+
+
+  
+  

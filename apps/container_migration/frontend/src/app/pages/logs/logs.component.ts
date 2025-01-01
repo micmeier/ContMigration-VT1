@@ -38,7 +38,8 @@ export class LogsComponent implements OnInit {
         this.viewedLabel = file.label!;
       });
     } else {
-      this.messageService.add({severity:'error', summary: 'Error', detail: 'Only text files can be viewed.'});
+      console.log("error")
+      this.messageService.add({key: 'tst', severity:'error', summary: 'Error', detail: 'Only text files can be viewed.'});
     }
   }
 

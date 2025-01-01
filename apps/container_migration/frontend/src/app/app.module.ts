@@ -19,6 +19,8 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { TreeModule } from 'primeng/tree';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { ContextMenuModule } from 'primeng/contextmenu';
+import { DialogModule } from 'primeng/dialog';
+import { ToastModule } from 'primeng/toast';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 
@@ -45,6 +47,8 @@ import { MessageService } from 'primeng/api';
     TreeModule,
     ContextMenuModule,
     ScrollPanelModule,
+    DialogModule,
+    ToastModule
   ],
   providers: [MessageService],
   bootstrap: [AppComponent]

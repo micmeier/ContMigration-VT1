@@ -36,5 +36,5 @@ async def delete_pod(cluster: str, pod_name: str):
         # Handle Kubernetes API exceptions
         raise HTTPException(
             status_code=e.status,
-            detail=f"Failed to delete pod '{pod_name}' in namespace '{namespace}': {e.reason}",
+            detail=f"Failed to delete pod '{pod_name}' in cluster '{cluster}': {e.reason}",
         )

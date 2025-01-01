@@ -1,0 +1,24 @@
+Clear Log Activities
+Contact K8S API Server From Container
+Create Hardlink Over Sensitive Files
+Create Symlink Over Sensitive Files
+Debugfs Launched in Privileged Container
+Detect release_agent File Container Escapes
+Disallowed SSH Connection Non Standard Port
+Drop and execute new binary in container
+Execution from /dev/shm
+Find AWS Credentials
+Fileless execution via memfd_create
+Linux Kernel Module Injection Detected
+Netcat Remote Code Execution in Container
+Packet socket created in container
+PTRACE anti-debug attempt
+PTRACE attached to process
+Read sensitive file trusted after startup
+Read sensitive file untrusted
+Redirect STDOUT/STDIN to Network Connection in Container
+Remove Bulk Data from Disk
+Run shell untrusted
+Search Private Keys or Passwords
+System user interactive
+Terminal shell in container

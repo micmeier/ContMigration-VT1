@@ -1,0 +1,20 @@
+{
+    "config": [
+        {
+            "rule": "Read sensitive file untrusted",
+            "cluster": "cluster1",
+            "action": "migrate",
+            "targetCluster": "cluster2",
+            "forensic_analysis": true,
+            "AI_suggestion": true
+        },
+        {
+            "rule": "Drop and execute new binary in container",
+            "cluster": "cluster1",
+            "action": "log",
+            "targetCluster": null,
+            "forensic_analysis": false,
+            "AI_suggestion": false
+        }
+    ]
+}
