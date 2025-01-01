@@ -9,7 +9,6 @@ async def get_pods(cluster: str):
     client = k8s_client.get_client(cluster)
     try:
         pods = client.list_namespaced_pod(namespace='default')
-        
         pod_info = [
             {"name": pod.metadata.name, "status": pod.status.phase}
             for pod in pods.items

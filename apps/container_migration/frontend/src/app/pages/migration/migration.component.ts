@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SelectItem } from 'primeng/api';
+import { MessageService, SelectItem } from 'primeng/api';
 import { K8sService } from '../../service/k8s.service';
 import { catchError, map, of, take, tap } from 'rxjs';
 import { PodsResponse } from '../../model/k8s.model';
@@ -21,7 +21,7 @@ export class MigrationComponent implements OnInit{
   isGeneratingFA = false;
   isGeneratingAISuggestion = false;
 
-  constructor(private k8sService: K8sService) {}
+  constructor(private k8sService: K8sService, private messageService: MessageService) {}
   ngOnInit(): void {
     
     this.sourceCluster = [
@@ -73,10 +73,11 @@ export class MigrationComponent implements OnInit{
     this.k8sService.migratePod(migrationRequest).pipe(
       take(1), // Ensures only one emission is taken
       tap((response: any) => {
-        console.log('Pod migration successful:', response);
+        this.messageService.add({ key: 'tst', severity: 'success', summary: 'Success', detail: 'Migration started successfully' });
+        this.reset();
       }),
       catchError((error: any) => {
-        console.error('Pod migration failed:', error);
+        this.messageService.add({ key: 'tst', severity: 'error', summary: 'Error', detail: error.detail });
         return of(error);
       })
     ).subscribe();
