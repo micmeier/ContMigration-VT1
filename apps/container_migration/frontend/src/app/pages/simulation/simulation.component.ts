@@ -32,8 +32,8 @@ export class SimulationComponent implements OnInit{
       this.k8sService.getPods('cluster1').pipe(
         map((podResponse: PodsResponse) => {
             return podResponse.pods
-            .filter(pod => pod.status === 'Running' && pod.name.startsWith('vuln-spring'))
-            .map(pod => ({ label: pod.name, value: pod.name } as SelectItem));
+            .filter(pod => pod.status === 'Running' && pod.podName!.startsWith('vuln-spring'))
+            .map(pod => ({ label: pod.podName, value: pod.podName } as SelectItem));
         }),
         catchError(() => {
           return of([] as SelectItem[]);

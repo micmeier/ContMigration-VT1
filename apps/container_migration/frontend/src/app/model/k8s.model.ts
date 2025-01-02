@@ -1,6 +1,8 @@
 export interface Pod {
-    name: string;
-    status: string;
+    podName?: string;
+    appName?: string;
+    status?: string;
+    reason?: string;
   }
   
 export interface PodsResponse {

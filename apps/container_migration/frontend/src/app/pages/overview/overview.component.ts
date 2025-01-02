@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { K8sService } from '../../service/k8s.service';
 import { catchError, interval, map, Observable, of, startWith, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { Pod, PodsResponse } from '../../model/k8s.model';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-overview',
@@ -15,7 +16,7 @@ export class OverviewComponent implements OnInit, OnDestroy{
   private destroy$ = new Subject<void>();
 
 
-  constructor(private k8sService: K8sService) {}
+  constructor(private k8sService: K8sService, private messageService: MessageService) {}
 
   public ngOnInit(): void {
     this.getPodsCluster1()
@@ -35,7 +36,6 @@ export class OverviewComponent implements OnInit, OnDestroy{
         switchMap(() =>
           this.k8sService.getPods('cluster1').pipe(
             map((podResponse: PodsResponse) => {
-              console.log(podResponse.pods);
               return podResponse.pods;
             }),
             catchError(() => {
@@ -76,6 +76,7 @@ export class OverviewComponent implements OnInit, OnDestroy{
       take(1), // Ensures only one emission is taken
       tap(() => {
         console.log(`Pod ${podName} in cluster ${cluster} deleted successfully.`);
+        this.messageService.add({key: 'tst', severity: 'success', summary: 'Success', detail: `Pod ${podName} deleted successfully.` });
         if(cluster === 'cluster1') {
           this.getPodsCluster1();
         } else if (cluster === 'cluster2') {
@@ -84,6 +85,7 @@ export class OverviewComponent implements OnInit, OnDestroy{
       }),
       catchError((error: any) => {
         console.error(`Failed to delete pod ${podName} in cluster ${cluster}:`, error);
+        this.messageService.add({key: 'tst', severity: 'error', summary: 'Error', detail: `Failed to delete pod ${podName}`});
         return of(error);
       })
     ).subscribe();

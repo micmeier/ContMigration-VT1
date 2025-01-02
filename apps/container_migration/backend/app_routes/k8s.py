@@ -9,12 +9,21 @@ async def get_pods(cluster: str):
     client = k8s_client.get_client(cluster)
     try:
         pods = client.list_namespaced_pod(namespace='default')
-        pod_info = [
-            {"name": pod.metadata.name, "status": pod.status.phase}
-            for pod in pods.items
-        ]
+        podsList = []
+        for pod in pods.items:
+            pod_info = dict({
+                "podName": pod.metadata.name, 
+                "appName": pod.metadata.labels.get('app', 'N/A'), 
+                "status": pod.status.phase
+            })
+
+            if pod.status.phase == "Pending" and pod.status.container_statuses:
+                waiting_reason = pod.status.container_statuses[0].state.waiting.reason if pod.status.container_statuses[0].state.waiting else "Unknown"
+                pod_info.update({"reason": waiting_reason})
+            
+            podsList.append(pod_info)
         
-        return {"pods": pod_info}
+        return {"pods": podsList}
     
     except client.exceptions.ApiException as e:
         raise HTTPException(status_code=500, detail=f"Error fetching pods: {e}")

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MessageService, SelectItem } from 'primeng/api';
 import { K8sService } from '../../service/k8s.service';
 import { catchError, map, of, take, tap } from 'rxjs';
-import { PodsResponse } from '../../model/k8s.model';
+import { Pod, PodsResponse } from '../../model/k8s.model';
 import { MigrationRequest } from '../../model/migration-request.model';
 
 @Component({
@@ -17,7 +17,7 @@ export class MigrationComponent implements OnInit{
   podsCluster1: SelectItem[] = [];
   selectedSource: string = '';
   selectedTarget: string = '';
-  selectedPod: string = '';
+  selectedPod: Pod = {} as Pod;
   isGeneratingFA = false;
   isGeneratingAISuggestion = false;
 
@@ -40,7 +40,7 @@ export class MigrationComponent implements OnInit{
       map((podResponse: PodsResponse) => {
         return podResponse.pods
           .filter(pod => pod.status === 'Running')
-          .map(pod => ({ label: pod.name, value: pod.name } as SelectItem));
+          .map(pod => ({ label: pod.podName, value: {"podName": pod.podName, "appName": pod.appName} } as SelectItem));
       }),
       catchError(() => {
         return of([] as SelectItem[]);
@@ -51,9 +51,12 @@ export class MigrationComponent implements OnInit{
   }
 
   public reset(): void {
+    console.log(this.selectedPod.appName)
+    console.log(this.selectedPod.podName)
+    console.log(typeof(this.selectedPod))
     this.selectedSource = '';
     this.selectedTarget = '';
-    this.selectedPod = '';
+    this.selectedPod = {} as Pod;
     this.isGeneratingFA = false;
     this.isGeneratingAISuggestion = false;
   }
@@ -64,11 +67,12 @@ export class MigrationComponent implements OnInit{
 
   public migratePod(): void {
     const migrationRequest: MigrationRequest = {
-      source_cluster: this.selectedSource,
-      target_cluster: this.selectedTarget,
-      pod_name: this.selectedPod,
-      generate_forensic_report: this.isGeneratingFA,
-      generate_AI_suggestion: this.isGeneratingAISuggestion
+      sourceCluster: this.selectedSource,
+      targetCluster: this.selectedTarget,
+      podName: this.selectedPod.podName!,
+      appName: this.selectedPod.appName!,
+      forensicAnalysis: this.isGeneratingFA,
+      AISuggestion: this.isGeneratingAISuggestion
     };
     this.k8sService.migratePod(migrationRequest).pipe(
       take(1), // Ensures only one emission is taken

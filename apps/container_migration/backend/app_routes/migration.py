@@ -81,17 +81,18 @@ async def migrate_pod(request: Request):
     print(f"Request body: ", body)
 
     #Currently source and target are not used because migration is always from cluster1 to cluster2
-    source_cluster = body.get("source_cluster")
-    target_cluster = body.get("target_cluster")
+    source_cluster = body.get("sourceCluster")
+    target_cluster = body.get("targetCluster")
     
-    pod_name = body.get("pod_name")
-    print(f"Pod name", pod_name)
+    pod_name = body.get("podName")
+    app_name = body.get("appName")
+
+    generate_forensic_report = body.get("forensicAnalysis")
     #TODO: Implement the logic to generate forensic report and AI suggestions
-    generate_forensic_report = body.get("generate_forensic_report")
-    generate_AI_suggestion = body.get("generate_AI_suggestion")
+    generate_AI_suggestion = body.get("AISuggestion")
     info = MigrationInfo(
         k8s_pod_name=pod_name,
-        container_name="manual",
+        container_name=app_name,
         migration_type="manual",
         forensic_analysis=generate_forensic_report,
         AI_suggestion=generate_AI_suggestion

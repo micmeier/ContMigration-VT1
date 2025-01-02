@@ -20,7 +20,6 @@ export class LogsComponent implements OnInit {
   ngOnInit(): void {
     this.getLogStructure();
     this.items = [
-      {label: 'View', icon: 'pi pi-search', command: (event) => this.viewFile(this.selectedFile)},
       {label: 'Download', icon: 'pi pi-download', command: (event) => this.downloadFile(this.selectedFile)}
     ];
   }
@@ -44,23 +43,34 @@ export class LogsComponent implements OnInit {
   }
 
   nodeSelect(event: any) {
+    if (this.isFolder(event.node)) {
+      return;
+    }
+    this.viewFile(this.selectedFile)
     if(event.node.label !== this.viewedLabel) {
       this.viewFileContent = '';
     }
   }
 
   downloadFile(file: TreeNode) {
+    console.log(file.parent)
     if(file.label && file.label.endsWith('.txt')) {
       this.logService.downloadFile(file).subscribe((blob: any) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = file.label!;
+        a.download = `${file.parent!.label}_${file.label!}`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
       });
-    };
+    } else {
+      this.messageService.add({key: 'tst', severity:'error', summary: 'Error', detail: 'Only text files can be downloaded.'});
+    }
   }
+
+  private isFolder(file: TreeNode): boolean {
+    return !file.label!.includes('.');
+  } 
 }
