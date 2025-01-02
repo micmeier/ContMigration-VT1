@@ -3,6 +3,7 @@ export interface Pod {
     appName?: string;
     status?: string;
     reason?: string;
+    age?: string;
   }
   
 export interface PodsResponse {

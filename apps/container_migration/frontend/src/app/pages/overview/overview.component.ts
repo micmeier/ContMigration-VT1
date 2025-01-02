@@ -75,7 +75,6 @@ export class OverviewComponent implements OnInit, OnDestroy{
     this.k8sService.deletePod(cluster, podName).pipe(
       take(1), // Ensures only one emission is taken
       tap(() => {
-        console.log(`Pod ${podName} in cluster ${cluster} deleted successfully.`);
         this.messageService.add({key: 'tst', severity: 'success', summary: 'Success', detail: `Pod ${podName} deleted successfully.` });
         if(cluster === 'cluster1') {
           this.getPodsCluster1();
@@ -84,7 +83,6 @@ export class OverviewComponent implements OnInit, OnDestroy{
         }
       }),
       catchError((error: any) => {
-        console.error(`Failed to delete pod ${podName} in cluster ${cluster}:`, error);
         this.messageService.add({key: 'tst', severity: 'error', summary: 'Error', detail: `Failed to delete pod ${podName}`});
         return of(error);
       })

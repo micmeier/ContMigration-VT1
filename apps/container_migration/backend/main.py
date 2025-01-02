@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app_routes import logs, k8s, migration, config
+from app_routes import logs, k8s, migration, config, simulation
 
 app = FastAPI()
 
@@ -16,10 +16,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(migration.router, prefix="", tags=["Migrations"])
 app.include_router(logs.router, prefix="/logs", tags=["Logs"])
 app.include_router(k8s.router, prefix="/k8s", tags=["Kubernetes"])
-app.include_router(migration.router, prefix="", tags=["Migrations"])
 app.include_router(config.router, prefix="/config", tags=["Configuration"])
+app.include_router(simulation.router, prefix="/simulate", tags=["Attack Simulation"])
 
 
 if __name__ == "__main__":

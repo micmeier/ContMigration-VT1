@@ -5,7 +5,7 @@ metadata:
   annotations:
     io.kubernetes.cri-o.TrySkipVolumeSELinuxLabel: "true"
   labels:
-    app: nginx-restore
+    app: vuln-spring-restore
 spec:
   containers:
     - name: vuln-spring-restore

@@ -6,7 +6,7 @@ metadata:
     app: atomic-red-restore
 spec:
   containers:
-    - name: atomic-red
+    - name: atomic-red-restore
       image: 10.0.0.180:5000/atomicredteam:checkpoint
       imagePullPolicy: Always
       command: [ "sleep", "3560d" ]

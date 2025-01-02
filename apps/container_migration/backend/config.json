@@ -15,6 +15,30 @@
             "targetCluster": null,
             "forensic_analysis": false,
             "AI_suggestion": false
+        },
+        {
+            "rule": "Redirect STDOUT/STDIN to Network Connection in Container",
+            "cluster": "cluster1",
+            "action": "migrate",
+            "targetCluster": "cluster2",
+            "forensic_analysis": true,
+            "AI_suggestion": false
+        },
+        {
+            "rule": "Remove Bulk Data from Disk",
+            "cluster": "cluster1",
+            "action": "migrate",
+            "targetCluster": "cluster2",
+            "forensic_analysis": true,
+            "AI_suggestion": false
+        },
+        {
+            "rule": "Clear Log Activities",
+            "cluster": "cluster1",
+            "action": "migrate",
+            "targetCluster": "cluster2",
+            "forensic_analysis": true,
+            "AI_suggestion": false
         }
     ]
 }

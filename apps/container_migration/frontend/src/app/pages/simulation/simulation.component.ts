@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { K8sService } from '../../service/k8s.service';
-import { SelectItem } from 'primeng/api';
-import { catchError, map, of } from 'rxjs';
+import { MessageService, SelectItem } from 'primeng/api';
+import { catchError, map, of, take, tap } from 'rxjs';
 import { PodsResponse } from '../../model/k8s.model';
+import { SimulationService } from '../../service/simulation.service';
 
 @Component({
   selector: 'app-simulation',
@@ -13,16 +14,20 @@ export class SimulationComponent implements OnInit{
   
   targetPod: SelectItem[] = [];
   attackType: SelectItem[] = [];
-  selectedPod: string = '';
+  selectedApp: string = '';
   selectedAttack: string = '';
 
-  constructor(private k8sService: K8sService) {}
+  constructor(
+    private k8sService: K8sService, 
+    private simulationService: SimulationService,
+    private messageService: MessageService
+  ) {}
 
   ngOnInit(): void {
     this.attackType = [
       { label: 'Reverse shell', value: 'reverse_shell' },
       { label: 'Data destruction', value: 'data_destruction' },
-      { label: 'Log file tempering', value: 'log_tempering' }
+      { label: 'Log file removal', value: 'log_removal' }
     ];
 
     this.getPodsCluster1();
@@ -33,7 +38,7 @@ export class SimulationComponent implements OnInit{
         map((podResponse: PodsResponse) => {
             return podResponse.pods
             .filter(pod => pod.status === 'Running' && pod.podName!.startsWith('vuln-spring'))
-            .map(pod => ({ label: pod.podName, value: pod.podName } as SelectItem));
+            .map(pod => ({ label: pod.appName, value: pod.appName } as SelectItem));
         }),
         catchError(() => {
           return of([] as SelectItem[]);
@@ -44,14 +49,22 @@ export class SimulationComponent implements OnInit{
     }
 
   public reset(): void {
-    this.selectedPod = '';
+    this.selectedApp = '';
     this.selectedAttack = '';
   }
 
   public simulateAttack(): void {
     //TODO: Implement method to simulate an this.attackType[Symbol]
-    console.log("Simulating attack: " + this.selectedAttack + " on pod: " + this.selectedPod);
+    console.log("Simulating attack: " + this.selectedAttack + " on pod: " + this.selectedApp);
+    this.simulationService.triggerSimulation(this.selectedApp, this.selectedAttack).pipe(
+      take(1), // Ensures only one emission is taken
+      tap(() => {
+        this.messageService.add({key: 'tst', severity: 'success', summary: 'Success', detail: `${this.selectedAttack} triggered successfully on ${this.selectedApp}` });
+      }),
+      catchError((error: any) => {
+        this.messageService.add({key: 'tst', severity: 'error', summary: 'Error', detail: `Failed to trigger attack on ${this.selectedApp}`});
+        return of(error);
+      })
+    ).subscribe();
   }
-  
-  
 }

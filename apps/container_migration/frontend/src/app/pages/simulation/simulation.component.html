@@ -2,11 +2,11 @@
     <div class="col-12 md:col-6 gap-2">
         <div class="card">
             <h5>Attack simulation</h5>
-            <p>Choose the target pod and the attack type</p>
-            <p>Currently only spring application with CVE-AAAA is available</p>  
+            <p>Choose the target app and the attack type</p>
+            <p>Currently only spring application with CVE-2022-22963 is available</p>  
             <div class="p-formgrid grid">
                 <div class="field col">
-                    <p-dropdown [options]="targetPod" [(ngModel)]="selectedPod" placeholder="Select the target pod" [style]="{'width': '100%'}"></p-dropdown>
+                    <p-dropdown [options]="targetPod" [(ngModel)]="selectedApp" placeholder="Select the target application" [style]="{'width': '100%'}"></p-dropdown>
                 </div>
                 <div class="field col">
                     <p-dropdown [options]="attackType" [(ngModel)]="selectedAttack" placeholder="Select the attack type" [style]="{'width': '100%'}"></p-dropdown>    
@@ -17,7 +17,7 @@
                 <button pButton label="Reset" (click)="reset()" class="p-button-outlined p-button-secondary"></button>
                 <button pButton label="Attack" (click)="simulateAttack()"></button>
             </div>
-            
         </div>
     </div>
+    <p-toast key="tst"></p-toast>
 </div>

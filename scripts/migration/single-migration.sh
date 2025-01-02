@@ -1,11 +1,4 @@
 #!/bin/bash
-
-
-# Function to log messages
-log() {
-    echo "$1" >> "$log_file"
-}
-
 forensicAnalysis=false
 
 # Parse command-line options
@@ -24,7 +17,9 @@ if [ -z "$podName" ]; then
 fi
 
 index=1
+kubectl config use-context cluster1 || handle_error "Failed to switch context to cluster1"
 appName=$(kubectl get pods $podName -o jsonpath='{.metadata.labels.app}') || handle_error "Failed to get app name"
+
 log_dir="/home/ubuntu/contMigration_logs/$appName/$podName"
 log_file="$log_dir/migration_log.txt"
 
@@ -32,20 +27,30 @@ log_file="$log_dir/migration_log.txt"
 mkdir -p "$log_dir" || handle_error "Failed to create log directory"
 touch "$log_file" || handle_error "Failed to create log file"
 
+# Function to log messages
+log() {
+    echo "$1" >> "$log_file"
+}
+
+# Function to handle errors
+handle_error() {
+    log "Error: $1"
+    exit 1
+}
+
+
+
 echo "Index, Checkpoint Creation, Checkpoint Location, Permission Change, Image Creation, Image Push, Pod Ready, Total" >> /home/ubuntu/meierm78/ContMigration-VT1/scripts/utils/data_extraction/data_dump/${podName}_migration_times.csv
 
 
 
 log "Starting migration for $podName"
 
-kubectl config use-context cluster1 || handle_error "Failed to switch context to cluster1"
-
 currentCluster=$(kubectl config current-context) || handle_error "Failed to get current context"
 log "Source cluster: $currentCluster"
 
 destCluster="cluster2"
 log "Target cluster: $destCluster"
-
 
 # Step 2: Get pod, container names, and node where the pod is running
 containerName=$(kubectl get pods $podName -o jsonpath='{.spec.containers[0].name}') || handle_error "Failed to get container name"
@@ -150,7 +155,7 @@ kubectl delete pod $podName || handle_error "Failed to delete pod"
 sleep 5
 
 log "-- Collecting checkpoint data --"
-mkdir -p "/home/ubuntu/contMigtation_logs/$appName/$podName"
+mkdir -p "/home/ubuntu/contMigration_logs/$appName/$podName"
 /home/ubuntu/meierm78/ContMigration-VT1/scripts/utils/data_extraction/extract_info_with_output.sh $checkpointfile $index "/home/ubuntu/contMigration_logs/$appName/$podName"
 log "-- Checkpoint data collected --"
 

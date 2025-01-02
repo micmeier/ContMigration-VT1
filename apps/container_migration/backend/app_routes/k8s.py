@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, HTTPException
 from utils.k8s_client import k8s_client 
 
@@ -14,7 +15,8 @@ async def get_pods(cluster: str):
             pod_info = dict({
                 "podName": pod.metadata.name, 
                 "appName": pod.metadata.labels.get('app', 'N/A'), 
-                "status": pod.status.phase
+                "status": pod.status.phase,
+                "age": format_age(datetime.now(timezone.utc) - pod.metadata.creation_timestamp)
             })
 
             if pod.status.phase == "Pending" and pod.status.container_statuses:
@@ -46,3 +48,20 @@ async def delete_pod(cluster: str, pod_name: str):
             status_code=e.status,
             detail=f"Failed to delete pod '{pod_name}' in cluster '{cluster}': {e.reason}",
         )
+
+
+def format_age(age: timedelta) -> str:
+    days = age.days
+    seconds = age.seconds
+    hours = seconds // 3600
+    minutes = (seconds % 3600) // 60
+
+    if days > 0:
+        if hours > 0:
+            return f"{days}d{hours}h"
+        else:
+            return f"{days}d"
+    elif hours > 0:
+        return f"{hours}h{minutes}m"
+    else:
+        return f"{minutes}m"

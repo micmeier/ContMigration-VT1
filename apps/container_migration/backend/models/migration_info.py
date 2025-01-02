@@ -7,5 +7,5 @@ class MigrationInfo(BaseModel):
      k8s_pod_name: Optional[str]
      container_name: Optional[str]
      migration_type: Optional[str]
-     forensic_analysis: Optional[bool]
-     AI_suggestion: Optional[bool]
+     forensic_analysis: Optional[bool] = None
+     AI_suggestion: Optional[bool] = None

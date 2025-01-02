@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "./apps/testApp/vuln-spring"
+    ]
+}

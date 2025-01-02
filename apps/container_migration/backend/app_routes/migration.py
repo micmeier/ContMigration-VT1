@@ -23,15 +23,24 @@ async def handle_alerts(alert: Alert):
         container_name=alert.output_fields.container_name,
         migration_type="automated"
     )
-
+    if(info.rule != "PTRACE attached to process"):
+        print(f"Received alert: {info.rule} for pod: {info.k8s_pod_name}")
+        falco_log_path = f"{base_log_path}/falco"
+        os.makedirs(falco_log_path, exist_ok=True)
+        with open(f"{falco_log_path}/alert.txt", "a") as file:
+            file.write(f"Received alert: {info.rule} for pod: {info.k8s_pod_name} at {datetime.now(timezone)}\n")
+    
     for rule_config in config.config:
-        if alert.rule == rule_config.rule and alert.output_fields.k8s_pod_name not in triggeredMigrations:
+        if info.rule == rule_config.rule and info.k8s_pod_name not in triggeredMigrations:
             if rule_config.action == "migrate":
                 info.forensic_analysis = rule_config.forensic_analysis
                 info.AI_suggestion = rule_config.AI_suggestion
+                triggeredMigrations.append(info.k8s_pod_name)
+                print(f"Triggering migration for pod: {info.k8s_pod_name}")
                 return await trigger_migration(info)
             elif rule_config.action == "log":
-                handle_log(alert)
+                print(f"Logging event for pod: {info.k8s_pod_name}")
+                handle_log(info)
                 return {"message": "Event logged"}
 
 async def trigger_migration(info: MigrationInfo):
@@ -57,7 +66,7 @@ async def trigger_migration(info: MigrationInfo):
         if info.forensic_analysis:
             subprocess.Popen(["/home/ubuntu/meierm78/ContMigration-VT1/scripts/migration/single-migration.sh", info.k8s_pod_name, "--forensic-analysis"],  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         else:
-            subprocess.Popen(["/home/ubuntu/meierm78/ContMigration-VT1/scripts/migration/single-migration.sh", info.k8s_pod_name],  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.Popen(["/home/ubuntu/meierm78/ContMigration-VT1/scripts/migration/single-migration.sh", info.k8s_pod_name])
         return {"message": "Migration task has been started"}
 
     except subprocess.CalledProcessError as e:
