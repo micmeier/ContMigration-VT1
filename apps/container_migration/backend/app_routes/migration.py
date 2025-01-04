@@ -24,7 +24,6 @@ async def handle_alerts(alert: Alert):
         migration_type="automated"
     )
     if(info.rule != "PTRACE attached to process"):
-        print(f"Received alert: {info.rule} for pod: {info.k8s_pod_name}")
         falco_log_path = f"{base_log_path}/falco"
         os.makedirs(falco_log_path, exist_ok=True)
         with open(f"{falco_log_path}/alert.txt", "a") as file:
@@ -56,17 +55,20 @@ async def trigger_migration(info: MigrationInfo):
             file.write(f"Migration is triggered by user\n")
             file.write(f"Migration is triggered at {datetime.now(timezone)}\n\n")
     print(f"Forensic analysis: {info.forensic_analysis}")
+    print(f"AI suggestion: {info.AI_suggestion}")
     if info.forensic_analysis:
-        print("Generating forensic report")
         with open(f"{log_path}/forensic_report.txt", "w") as file:
             file.write(f"Forensic report of {info.migration_type} container migration of {info.k8s_pod_name}\n")
             file.write(f"Migration is triggered at {datetime.now(timezone)}\n\n")
 
     try:
+        cmd = ["/home/ubuntu/meierm78/ContMigration-VT1/scripts/migration/single-migration.sh", info.k8s_pod_name]
         if info.forensic_analysis:
-            subprocess.Popen(["/home/ubuntu/meierm78/ContMigration-VT1/scripts/migration/single-migration.sh", info.k8s_pod_name, "--forensic-analysis"],  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        else:
-            subprocess.Popen(["/home/ubuntu/meierm78/ContMigration-VT1/scripts/migration/single-migration.sh", info.k8s_pod_name])
+            cmd.append("--forensic-analysis")
+        if info.AI_suggestion:
+            cmd.append("--ai-suggestion")
+    
+        subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         return {"message": "Migration task has been started"}
 
     except subprocess.CalledProcessError as e:
@@ -87,7 +89,6 @@ def handle_log(info: MigrationInfo):
 @router.post("/migrate")
 async def migrate_pod(request: Request):
     body = await request.json()
-    print(f"Request body: ", body)
 
     #Currently source and target are not used because migration is always from cluster1 to cluster2
     source_cluster = body.get("sourceCluster")
@@ -107,3 +108,7 @@ async def migrate_pod(request: Request):
         AI_suggestion=generate_AI_suggestion
     )
     return await trigger_migration(info)
+
+def reload_config():
+    global config
+    config = load_config()

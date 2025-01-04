@@ -1,10 +1,12 @@
 #!/bin/bash
 forensicAnalysis=false
+AISuggestion=false
 
 # Parse command-line options
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -fa|--forensic-analysis) forensicAnalysis=true ;;
+        -ai|--ai-suggestion) AISuggestion=true ;;
         -h|--help) echo "-- Usage: $0 <podName> [--forensic-analysis|-fa] --"; exit 0 ;;
         *) podName=$1 ;;
     esac
@@ -16,7 +18,9 @@ if [ -z "$podName" ]; then
     exit 1
 fi
 
-index=1
+source /home/ubuntu/meierm78/ContMigration-VT1/scripts/migration/.env
+
+
 kubectl config use-context cluster1 || handle_error "Failed to switch context to cluster1"
 appName=$(kubectl get pods $podName -o jsonpath='{.metadata.labels.app}') || handle_error "Failed to get app name"
 
@@ -29,20 +33,115 @@ touch "$log_file" || handle_error "Failed to create log file"
 
 # Function to log messages
 log() {
-    echo "$1" >> "$log_file"
+  echo "$1" >> "$log_file"
 }
 
 # Function to handle errors
 handle_error() {
-    log "Error: $1"
-    exit 1
+  log "Error: $1"
+  exit 1
 }
 
+# Function to convert time units to milliseconds
+convert_to_ms() {
+  local time_str=$1
+  if [[ $time_str == *"ms" ]]; then
+    echo "${time_str% ms}"
+  elif [[ $time_str == *"µs" ]]; then
+    echo "$time_str" | awk '{printf "%.3f", $1 / 1000}'
+  else
+    echo "0"
+  fi
+}
 
+summarize_performance() {
+  checkpoint_info=$(checkpointctl inspect "$checkpointfile" --stats)
+  freezing_time=$(echo "$checkpoint_info" | grep -E '^\s*├── Freezing time:' | awk -F': ' '{print $2}')
+  frozen_time=$(echo "$checkpoint_info" | grep -E '^\s*├── Frozen time:' | awk -F': ' '{print $2}')
+  memdump_time=$(echo "$checkpoint_info" | grep -E '^\s*├── Memdump time:' | awk -F': ' '{print $2}')
+  memwrite_time=$(echo "$checkpoint_info" | grep -E '^\s*├── Memwrite time:' | awk -F': ' '{print $2}')
+  # Convert times to milliseconds and sum them using awk
+  total_dump_time_ms=$(awk -v fz=$(convert_to_ms "$freezing_time") \
+                          -v fn=$(convert_to_ms "$frozen_time") \
+                          -v md=$(convert_to_ms "$memdump_time") \
+                          -v mw=$(convert_to_ms "$memwrite_time") \
+                          'BEGIN {print fz + fn + md + mw}')
+  
+  cat <<EOF >> "$log_dir/performance_summary.txt"
+Performance Summary
+-------------------
+--- CRIU dump performance ---
+Freezing Time: $freezing_time 
+Frozen Time: $frozen_time
+Memdump Time: $memdump_time
+Memwrite Time: $memwrite_time
+Total Dump Time: ${total_dump_time_ms} ms
+-------------------
+--- Migration performance ---
+Checkpoint Creation: $checkpointTime ms
+Checkpoint Location: $latestCheckpointTime ms
+Permission Change: $permissionTime ms
+Image Creation: $newImageTime ms
+Image Push: $pushImageTime ms
+Pod Ready: $podReadyTime ms
+Total: $migrationTotalTime ms
+-------------------
+EOF
+}
 
-echo "Index, Checkpoint Creation, Checkpoint Location, Permission Change, Image Creation, Image Push, Pod Ready, Total" >> /home/ubuntu/meierm78/ContMigration-VT1/scripts/utils/data_extraction/data_dump/${podName}_migration_times.csv
+generate_ai_suggestion() {
+  # Read the contents of the forensic analysis file and save it to a variable
+  forensicReport=$(cat "$log_dir/forensic_report.txt" | jq -Rs .)
 
+  # Define the system instruction
+  systemInstruction="You are a professional IT security analyst specializing in container security. Your task is to analyze \`checkpointctl\` output provided by the user and generate a detailed security assessment. Specifically: \n- Identify and explain any issues, vulnerabilities, or misconfigurations present in the container based on the report.\n- Suggest corrective actions to address each identified issue.\n- Hypothesize potential attacks or threats that could exploit these vulnerabilities and explain the potential impact of these attacks.\n- Make one hypothesis about what attack happened in this container\n\nYour responses should be clear, concise, and professional, aimed at helping the user improve the container's security posture effectively. Use technical language appropriate for IT professionals and provide actionable recommendations.\n\nIt is possible that attacks come in a base64 encoded command. Make sure to decrypt the base64 encoded string to get more information about the attack.\n\n\nThe running app is a spring boot application.\nThe fact that these files are changed is required by the application and should not be considered as an issue:\n- etc/mtab\n- run/secrets/kubernetes.io/\n- run/secrets/kubernetes.io/serviceaccount/\n- tmp/hsperfdata_root/1"
 
+  # Use the variables inside the curl command
+  AIOutput=$(curl "https://api.groq.com/openai/v1/chat/completions" \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${GROQ_API_KEY}" \
+    -d "{
+          \"messages\": [
+            {
+              \"role\": \"system\",
+              \"content\": \"$systemInstruction\"
+            },
+            {
+              \"role\": \"user\",
+              \"content\": $forensicReport
+            }
+          ],
+          \"model\": \"llama-3.3-70b-versatile\",
+          \"temperature\": 1,
+          \"max_tokens\": 1024,
+          \"top_p\": 1,
+          \"stream\": false,
+          \"stop\": null
+        }") || handle_error "Failed to get AI suggestion"
+
+  ai_suggestion=$(echo "$AIOutput" | jq -r '.choices[0].message.content')
+  model=$(echo "$AIOutput" | jq -r '.model')
+  ai_queue_time=$(echo "$AIOutput" | jq -r '.usage.queue_time' | awk '{print $1 * 1000}')
+  ai_prompt_time=$(echo "$AIOutput" | jq -r '.usage.prompt_time' | awk '{print $1 * 1000}')
+  ai_completion_time=$(echo "$AIOutput" | jq -r '.usage.completion_time' | awk '{print $1 * 1000}')
+  ai_total_time=$(echo "$AIOutput" | jq -r '.usage.total_time' | awk '{print $1 * 1000}')
+  
+  # Create a new file and save the values of model and ai_suggestion
+  ai_suggestion_file="$log_dir/ai_suggestion.txt"
+  echo "Model: $model" > "$ai_suggestion_file"
+  echo "AI Suggestion: $ai_suggestion" >> "$ai_suggestion_file"
+
+      cat <<EOF >> "$log_dir/performance_summary.txt"
+--- AI generation performance ---
+Queue Time: $ai_queue_time ms
+Prompt Time: $ai_prompt_time ms
+Completion Time: $ai_completion_time ms
+Total Time: $ai_total_time ms
+-------------------
+EOF
+
+}
 
 log "Starting migration for $podName"
 
@@ -51,6 +150,10 @@ log "Source cluster: $currentCluster"
 
 destCluster="cluster2"
 log "Target cluster: $destCluster"
+
+log "Forensic analysis: $forensicAnalysis"
+log "AI suggestion: $AISuggestion"
+
 
 # Step 2: Get pod, container names, and node where the pod is running
 containerName=$(kubectl get pods $podName -o jsonpath='{.spec.containers[0].name}') || handle_error "Failed to get container name"
@@ -141,8 +244,6 @@ podReadyTime=$(($(date +%s%3N) - $startTime))
 
 migrationTotalTime=$(($(date +%s%3N) - $migrationStartTime))
 
-echo "${index}, ${checkpointTime}, ${latestCheckpointTime}, ${permissionTime}, ${newImageTime}, ${pushImageTime}, ${podReadyTime}, ${migrationTotalTime}" >> /home/ubuntu/meierm78/ContMigration-VT1/scripts/utils/data_extraction/data_dump/${podName}_migration_times.csv
-
 log "-- $newPodName running --"
 
 log "------------------------------------------------------------------"
@@ -152,21 +253,30 @@ log "--- Deleting old pod ---"
 kubectl config use-context cluster1 || handle_error "Failed to switch context to cluster1"
 kubectl delete pod $podName || handle_error "Failed to delete pod"
 
+log "-- Old pod \"$podName\" deleted --"
 sleep 5
 
-log "-- Collecting checkpoint data --"
-mkdir -p "/home/ubuntu/contMigration_logs/$appName/$podName"
-/home/ubuntu/meierm78/ContMigration-VT1/scripts/utils/data_extraction/extract_info_with_output.sh $checkpointfile $index "/home/ubuntu/contMigration_logs/$appName/$podName"
-log "-- Checkpoint data collected --"
-
 log "------------------------------------------------------------------"
+
+log "-- Summarizing migration performance --"
+summarize_performance
+log "-- Performance summary created --"
+
 
 if [ "$forensicAnalysis" == true ]; then
   log "-- Performing forensic analysis --"
   sudo chmod 770 /home/ubuntu/meierm78/ContMigration-VT1/scripts/utils/forensic_analysis/forensic_analysis.sh
-  /home/ubuntu/meierm78/ContMigration-VT1/scripts/utils/forensic_analysis/forensic_analysis.sh "$checkpointfile" "/home/ubuntu/contMigration_logs/$appName/$podName"
+  /home/ubuntu/meierm78/ContMigration-VT1/scripts/utils/forensic_analysis/forensic_analysis.sh "$checkpointfile" "$log_dir" || handle_error "Failed to perform forensic analysis"
   log "-- Forensic analysis complete --"
 fi
+
+if [ "$forensicAnalysis" == true ] && [ "$AISuggestion" == true ]; then
+  log "-- Asking AI for suggestion --"
+  generate_ai_suggestion
+  log "-- AI suggestion generated --"
+fi
+
+log "------------------------------------------------------------------"
 
 checkpointDir="/home/ubuntu/nfs/checkpoints/${nodename}/checkpoint-*_default-${containerName}-*.tar"
 log "-- Deleting oldest checkpoint if more than 5 are saved --"
