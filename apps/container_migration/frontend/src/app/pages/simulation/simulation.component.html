@@ -15,7 +15,7 @@
 
             <div class="flex flex-wrap gap-2" style="display: flex; justify-content: flex-end;">
                 <button pButton label="Reset" (click)="reset()" class="p-button-outlined p-button-secondary"></button>
-                <button pButton label="Attack" (click)="simulateAttack()"></button>
+                <button pButton label="Attack" (click)="simulateAttack()" [loading]="loading"></button>
             </div>
         </div>
     </div>

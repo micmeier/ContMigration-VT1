@@ -16,6 +16,7 @@ export class SimulationComponent implements OnInit{
   attackType: SelectItem[] = [];
   selectedApp: string = '';
   selectedAttack: string = '';
+  loading = false;
 
   constructor(
     private k8sService: K8sService, 
@@ -54,12 +55,14 @@ export class SimulationComponent implements OnInit{
   }
 
   public simulateAttack(): void {
-    //TODO: Implement method to simulate an this.attackType[Symbol]
+    this.loading = true;
     console.log("Simulating attack: " + this.selectedAttack + " on pod: " + this.selectedApp);
     this.simulationService.triggerSimulation(this.selectedApp, this.selectedAttack).pipe(
-      take(1), // Ensures only one emission is taken
+      take(1), 
       tap(() => {
+        this.loading = false;
         this.messageService.add({key: 'tst', severity: 'success', summary: 'Success', detail: `${this.selectedAttack} triggered successfully on ${this.selectedApp}` });
+        this.reset();
       }),
       catchError((error: any) => {
         this.messageService.add({key: 'tst', severity: 'error', summary: 'Error', detail: `Failed to trigger attack on ${this.selectedApp}`});

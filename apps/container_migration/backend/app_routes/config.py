@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from models.config_model import RuleConfig
 from utils.migration_util import load_config, save_config
-from migration import reload_config
+from app_routes.migration import reload_config
 
 router = APIRouter()
 

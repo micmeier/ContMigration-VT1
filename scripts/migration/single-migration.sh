@@ -254,7 +254,6 @@ kubectl config use-context cluster1 || handle_error "Failed to switch context to
 kubectl delete pod $podName || handle_error "Failed to delete pod"
 
 log "-- Old pod \"$podName\" deleted --"
-sleep 5
 
 log "------------------------------------------------------------------"
 

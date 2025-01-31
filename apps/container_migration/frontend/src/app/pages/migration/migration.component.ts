@@ -20,6 +20,7 @@ export class MigrationComponent implements OnInit{
   selectedPod: Pod = {} as Pod;
   isGeneratingFA = false;
   isGeneratingAISuggestion = false;
+  loading = false;
 
   constructor(private k8sService: K8sService, private messageService: MessageService) {}
   ngOnInit(): void {
@@ -66,6 +67,7 @@ export class MigrationComponent implements OnInit{
   }
 
   public migratePod(): void {
+    this.loading = true;
     const migrationRequest: MigrationRequest = {
       sourceCluster: this.selectedSource,
       targetCluster: this.selectedTarget,
@@ -77,6 +79,7 @@ export class MigrationComponent implements OnInit{
     this.k8sService.migratePod(migrationRequest).pipe(
       take(1), // Ensures only one emission is taken
       tap((response: any) => {
+        this.loading = false;
         this.messageService.add({ key: 'tst', severity: 'success', summary: 'Success', detail: 'Migration started successfully' });
         this.reset();
       }),

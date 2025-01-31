@@ -68,7 +68,10 @@ async def trigger_migration(info: MigrationInfo):
         if info.AI_suggestion:
             cmd.append("--ai-suggestion")
     
-        subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        #subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if result.returncode != 0:
+            raise HTTPException(status_code=500, detail=f"Error executing script: {result.stderr}")
         return {"message": "Migration task has been started"}
 
     except subprocess.CalledProcessError as e:

@@ -24,7 +24,7 @@
                 </div>    
                 <div class="flex flex-wrap gap-2" style="display: flex; justify-content: flex-end;">
                     <button pButton label="Reset" (click)="reset()" class="p-button-outlined p-button-secondary"></button>
-                    <button pButton label="Migrate" (click)="migratePod()"></button>
+                    <button pButton label="Migrate" (click)="migratePod()" [loading]="loading"></button>
                 </div>
             }
         </div>
